@@ -1,8 +1,13 @@
 import { useState } from 'react';
 import { Sidebar, Menu, Icon, Segment, Button, Image } from 'semantic-ui-react';
+import { Link, Routes, Route } from 'react-router-dom';
+import Home from '../Home/';
+import User from '../User/';
+import Supplier from '../Supplier';
 import userIcon from '../../assets/user-icon.png';
 import logoSistema from '../../assets/logo-sistema.png';
 import './SideMenu.css';
+import Employee from '../Employee';
 
 export default function SideMenu() {
   const [visible, setVisible] = useState(true);
@@ -17,7 +22,7 @@ export default function SideMenu() {
         </Button>
       </div>
 
-      <Sidebar.Pushable as={Segment} style={{ minHeight: '96vh', margin: 0 }}>
+      <Sidebar.Pushable as={Segment} style={{ minHeight: '96vh', margin: 0, display: 'flex' }}>
         <Sidebar
           as={Menu}
           animation="push"
@@ -40,25 +45,33 @@ export default function SideMenu() {
                 <p style={{ color: '#000', marginTop: '10px', fontSize: '18px' }}>Administrador</p>
               </div>
             </Menu.Item>
-            <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
+            <Menu.Item as={Link} to="/" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="home" />
               Inicio
             </Menu.Item>
-            <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
+            <Menu.Item as={Link} to="/appointments" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="calendar" />
               Citas
             </Menu.Item>
-            <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
+            <Menu.Item as={Link} to="/clients" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="user" />
               Clientes
             </Menu.Item>
-            <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
+            <Menu.Item as={Link} to="/services" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="shopping bag" />
               Servicios
             </Menu.Item>
-            <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
+            <Menu.Item as={Link} to="/users" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="users" />
               Usuarios
+            </Menu.Item>
+            <Menu.Item as={Link} to="/suppliers" style={{ color: '#000', fontSize: 20 }}>
+              <Icon name="truck" />
+              Proveedores
+            </Menu.Item>
+            <Menu.Item as={Link} to="/employees" style={{ color: '#000', fontSize: 20 }}>
+              <Icon name="users" />
+              Empleados
             </Menu.Item>
             <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="sign-out" />
@@ -72,9 +85,14 @@ export default function SideMenu() {
           </Menu.Item>
         </Sidebar>
 
-        <Sidebar.Pusher>
+        <Sidebar.Pusher style={{ padding: '20px', flex: 1 }}>
           <Segment basic>
-            <h1>Home</h1>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/users" element={<User />} />
+              <Route path="/suppliers" element={<Supplier isSidebarVisible={visible}/>} />
+              <Route path="/employees" element={<Employee isSidebarVisible={visible}/>} />
+            </Routes>
           </Segment>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
