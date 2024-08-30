@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FormField, Button, Form } from "semantic-ui-react";
+import Swal from 'sweetalert2';
 
 const EmployeeForm = ({
   selectedItem,
@@ -127,11 +128,19 @@ const EmployeeForm = ({
     if (response.ok) {
       console.log("Registro guardado correctamente");
 
-      alert("Formulario enviado exitosamente");
+      Swal.fire({
+        title: "Guardado",
+        text: "Registro enviado exitosamente!",
+        icon: "success"
+      });
       onFormSubmit();
       closeModal();
     } else {
-      alert("Error al enviar el formulario");
+        Swal.fire({
+            title: "Oops...",
+            text: "Algo ha salido mal, intenta de nuevo!",
+            icon: "error"
+          });
       console.error("Error al enviar el formulario");
     }
   };
