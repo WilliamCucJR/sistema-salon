@@ -53,6 +53,19 @@ export default function CatalogueTable({
         "EMP_STATE",
       ],
     },
+    products: {
+      apiFields: ["PRO_NAME", "PRO_MEASUREMENT", "PRO_QUANTITY", "PRO_VALUE", "PRO_DESCRIPTION"],
+      tableHeaders: ["Nombre", "Medida", "Cantidad", "Precio", "Descripción"],
+      formInputs: [
+        "PRO_ID",
+        "SUP_ID",
+        "PRO_NAME",
+        "PRO_MEASUREMENT",
+        "PRO_QUANTITY",
+        "PRO_VALUE",
+        "PRO_DESCRIPTION",
+      ],
+    },
     // Agrega más tipos de catálogo
   };
 
@@ -60,6 +73,7 @@ export default function CatalogueTable({
     const idFields = {
       suppliers: "SUP_ID",
       employees: "EMP_ID",
+      products: "PRO_ID",
       // Agrega más tipos de catálogo
     };
     return idFields[catalogueType];
