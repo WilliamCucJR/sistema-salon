@@ -113,17 +113,18 @@ const SupplierForm = ({
     <>
       <Form onSubmit={handleSubmit}>
         <div style={formScrollableDiv}>
-          <FormField>
-            <label>ID</label>
-            <input
-              type="number"
-              name="SUP_ID"
-              placeholder="ID"
-              value={formData.SUP_ID}
-              onChange={handleChange}
-              readOnly
-            />
-          </FormField>
+          {formData.SUP_ID && (
+            <FormField>
+              <label>ID</label>
+              <input
+                type="number"
+                name="SUP_ID"
+                placeholder="ID"
+                value={formData.SUP_ID}
+                onChange={handleChange}
+              />
+            </FormField>
+          )}
           <FormField>
             <label>NIT</label>
             <input

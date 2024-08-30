@@ -19,7 +19,6 @@ const EmployeeForm = ({
       employee.EMP_HIREDATE = formatDate(employee.EMP_HIREDATE);
     }
     // Agrega más campos de fecha si es necesario
-    
   });
 
   console.log(selectedItem);
@@ -67,10 +66,11 @@ const EmployeeForm = ({
         acc[key] = curr[key];
         return acc;
       }, {});
+      
 
       setFormData({
         EMP_ID: transformedData.EMP_ID || "",
-        USE_ID: transformedData.USE_ID || "",
+        USE_ID: transformedData.USE_ID || null,
         EMP_EMAIL: transformedData.EMP_EMAIL || "",
         EMP_HIREDATE: transformedData.EMP_HIREDATE || "",
         EMP_FIRST_NAME: transformedData.EMP_FIRST_NAME || "",
@@ -140,26 +140,25 @@ const EmployeeForm = ({
     <>
       <Form onSubmit={handleSubmit}>
         <div style={formScrollableDiv}>
+          {formData.EMP_ID && (
+            <FormField>
+              <label>ID</label>
+              <input
+                type="text"
+                name="EMP_ID"
+                placeholder="ID"
+                value={formData.EMP_ID}
+                onChange={handleChange}
+              />
+            </FormField>
+          )}
           <FormField>
-            <label>ID</label>
             <input
-              type="number"
-              name="EMP_ID"
-              placeholder="ID"
-              value={formData.EMP_ID}
-              onChange={handleChange}
-              readOnly
-            />
-          </FormField>
-          <FormField>
-            <label>Usuario ID</label>
-            <input
-              type="number"
+              type="hidden"
               name="USE_ID"
               placeholder="Usuario ID"
               value={formData.USE_ID}
               onChange={handleChange}
-              required
             />
           </FormField>
           <FormField>
