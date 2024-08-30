@@ -1,7 +1,14 @@
 import { useState, useEffect } from "react";
 import { FormField, Button, Form } from "semantic-ui-react";
 
-const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
+const SupplierForm = ({
+  selectedItem,
+  closeModal,
+  onFormSubmit,
+  catalogueType,
+}) => {
+  const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
+
   const [formData, setFormData] = useState({
     SUP_ID: "",
     SUP_NIT: "",
@@ -32,7 +39,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
     height: "400px",
     overflowY: "scroll",
     marginBottom: "20px",
-  }
+  };
 
   useEffect(() => {
     if (selectedItem) {
@@ -68,8 +75,8 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
 
     const method = formData.SUP_ID ? "PUT" : "POST";
     const url = formData.SUP_ID
-      ? `http://localhost:3000/api/suppliers/${formData.SUP_ID}`
-      : "http://localhost:3000/api/suppliers";
+      ? `${urlBase}${catalogueType}/${formData.SUP_ID}`
+      : `${urlBase}${catalogueType}`;
 
     const response = await fetch(url, {
       method: method,
@@ -109,6 +116,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>ID</label>
             <input
+              type="number"
               name="SUP_ID"
               placeholder="ID"
               value={formData.SUP_ID}
@@ -119,6 +127,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>NIT</label>
             <input
+              type="text"
               name="SUP_NIT"
               placeholder="NIT"
               value={formData.SUP_NIT}
@@ -129,6 +138,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Nombre Social</label>
             <input
+              type="text"
               name="SUP_SOCIAL_NAME"
               placeholder="Nombre Social"
               value={formData.SUP_SOCIAL_NAME}
@@ -139,6 +149,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Nombre</label>
             <input
+              type="text"
               name="SUP_NAME"
               placeholder="Nombre"
               value={formData.SUP_NAME}
@@ -149,6 +160,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Primera Linea</label>
             <input
+              type="text"
               name="SUP_FIRST_LINE"
               placeholder="Primera Linea"
               value={formData.SUP_FIRST_LINE}
@@ -159,6 +171,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Segunda Linea</label>
             <input
+              type="text"
               name="SUP_SECOND_LINE"
               placeholder="Segunda Linea"
               value={formData.SUP_SECOND_LINE}
@@ -169,6 +182,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Residencial</label>
             <input
+              type="text"
               name="SUP_RESIDENTIARY"
               placeholder="Residencial"
               value={formData.SUP_RESIDENTIARY}
@@ -179,6 +193,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Avenida</label>
             <input
+              type="text"
               name="SUP_AVENUE"
               placeholder="Avenida"
               value={formData.SUP_AVENUE}
@@ -189,6 +204,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Zona</label>
             <input
+              type="number"
               name="SUP_ZONE"
               placeholder="Zona"
               value={formData.SUP_ZONE}
@@ -199,6 +215,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Ciudad</label>
             <input
+              type="text"
               name="SUP_CITY"
               placeholder="Ciudad"
               value={formData.SUP_CITY}
@@ -209,6 +226,7 @@ const SupplierForm = ({ selectedItem, closeModal, onFormSubmit }) => {
           <FormField>
             <label>Estado</label>
             <input
+              type="text"
               name="SUP_STATE"
               placeholder="Estado"
               value={formData.SUP_STATE}

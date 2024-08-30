@@ -10,7 +10,9 @@ export default function CatalogueTable({
 }) {
   const [catalogue, setCatalogue] = useState([]);
   const [error, setError] = useState(null);
-  const ruta = "http://localhost:3000/api/" + catalogueType;
+  const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
+
+  const addUpdateRoute = `${urlBase}` + catalogueType;
 
   const catalogueFields = {
     suppliers: {
@@ -39,7 +41,7 @@ export default function CatalogueTable({
         "EMP_EMAIL",
         "EMP_HIREDATE",
         "EMP_FIRST_NAME",
-        "EMP_MIDDEL_NAME",
+        "EMP_MIDDLE_NAME",
         "EMP_LAST_NAME",
         "EMP_SECONDLAST_NAME",
         "EMP_FIRST_LINE",
@@ -51,11 +53,23 @@ export default function CatalogueTable({
         "EMP_STATE",
       ],
     },
+    // Agrega más tipos de catálogo
   };
+
+  const getIdField = (catalogueType) => {
+    const idFields = {
+      suppliers: "SUP_ID",
+      employees: "EMP_ID",
+      // Agrega más tipos de catálogo
+    };
+    return idFields[catalogueType];
+  };
+
+  const idField = getIdField(catalogueType);
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch(ruta);
+      const response = await fetch(addUpdateRoute);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -69,7 +83,7 @@ export default function CatalogueTable({
       );
       setError(error);
     }
-  }, [ruta, catalogueType]);
+  }, [addUpdateRoute, catalogueType]);
 
   useEffect(() => {
     fetchData();
@@ -83,12 +97,9 @@ export default function CatalogueTable({
     console.log("Entro a la funcion con id ", id);
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/suppliers/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`${urlBase}${catalogueType}/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -116,7 +127,12 @@ export default function CatalogueTable({
 
   return (
     <>
-      <Button onClick={() => handleOpenModal(null)} style={{ marginBottom:'20px' }}>Agregar +</Button>
+      <Button
+        onClick={() => handleOpenModal(null)}
+        style={{ marginBottom: "20px" }}
+      >
+        Agregar +
+      </Button>
       <div className="scrollable-div-table">
         {error ? (
           <div>Error al cargar los datos: {error.message}</div>
@@ -145,7 +161,7 @@ export default function CatalogueTable({
                   <Table.Cell style={{ textAlign: "center" }}>
                     <Button onClick={() => handleOpenModal(item)} icon="edit" />
                     <Button
-                      onClick={() => handleDelete(item.SUP_ID)}
+                      onClick={() => handleDelete(item[idField])}
                       icon="trash alternate"
                     />
                   </Table.Cell>

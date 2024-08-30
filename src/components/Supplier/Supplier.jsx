@@ -26,7 +26,7 @@ export default function Supplier({ isSidebarVisible }) {
 
   return (
     <div>
-      <h1>Desde componente Supplier</h1>
+      <h1>Proveedores</h1>
       <CatalogueTable
         openModal={openModal}
         isSidebarVisible={isSidebarVisible}
