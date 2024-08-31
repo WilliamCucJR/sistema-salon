@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Table, Button } from "semantic-ui-react";
 import "./CatalogueTable.css";
+import Swal from 'sweetalert2';
 
 export default function CatalogueTable({
   isSidebarVisible,
@@ -61,6 +62,19 @@ export default function CatalogueTable({
         "SER_SERVICENAME",
         "SER_VALUE",
       ],
+    },  
+    products: {
+      apiFields: ["PRO_NAME", "PRO_MEASUREMENT", "PRO_QUANTITY", "PRO_VALUE", "PRO_DESCRIPTION"],
+      tableHeaders: ["Nombre", "Medida", "Cantidad", "Precio", "Descripción"],
+      formInputs: [
+        "PRO_ID",
+        "SUP_ID",
+        "PRO_NAME",
+        "PRO_MEASUREMENT",
+        "PRO_QUANTITY",
+        "PRO_VALUE",
+        "PRO_DESCRIPTION",
+      ],
     },
     // Agrega más tipos de catálogo
   };
@@ -70,6 +84,7 @@ export default function CatalogueTable({
       suppliers: "SUP_ID",
       employees: "EMP_ID",
       services: "SER_ID",
+      products: "PRO_ID",
       // Agrega más tipos de catálogo
     };
     return idFields[catalogueType];
@@ -113,7 +128,11 @@ export default function CatalogueTable({
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      alert("Registro eliminado correctamente");
+      Swal.fire({
+        title: "Eliminado!",
+        text: "Registro eliminado correctamente!",
+        icon: "success"
+      });
       fetchData();
     } catch (error) {
       console.log("Error al eliminar el registro", error);

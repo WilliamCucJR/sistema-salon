@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FormField, Button, Form } from "semantic-ui-react";
+import Swal from 'sweetalert2';
 
 const SupplierForm = ({
   selectedItem,
@@ -100,11 +101,19 @@ const SupplierForm = ({
     if (response.ok) {
       console.log("Registro guardado correctamente");
 
-      alert("Formulario enviado exitosamente");
+      Swal.fire({
+        title: "Guardado",
+        text: "Registro enviado exitosamente!",
+        icon: "success"
+      });
       onFormSubmit();
       closeModal();
     } else {
-      alert("Error al enviar el formulario");
+        Swal.fire({
+            title: "Oops...",
+            text: "Algo ha salido mal, intenta de nuevo!",
+            icon: "error"
+          });
       console.error("Error al enviar el formulario");
     }
   };
@@ -113,17 +122,18 @@ const SupplierForm = ({
     <>
       <Form onSubmit={handleSubmit}>
         <div style={formScrollableDiv}>
-          <FormField>
-            <label>ID</label>
-            <input
-              type="number"
-              name="SUP_ID"
-              placeholder="ID"
-              value={formData.SUP_ID}
-              onChange={handleChange}
-              readOnly
-            />
-          </FormField>
+          {formData.SUP_ID && (
+            <FormField>
+              <label>ID</label>
+              <input
+                type="number"
+                name="SUP_ID"
+                placeholder="ID"
+                value={formData.SUP_ID}
+                onChange={handleChange}
+              />
+            </FormField>
+          )}
           <FormField>
             <label>NIT</label>
             <input

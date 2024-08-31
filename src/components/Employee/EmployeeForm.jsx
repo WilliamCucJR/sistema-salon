@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FormField, Button, Form } from "semantic-ui-react";
+import Swal from 'sweetalert2';
 
 const EmployeeForm = ({
   selectedItem,
@@ -19,7 +20,6 @@ const EmployeeForm = ({
       employee.EMP_HIREDATE = formatDate(employee.EMP_HIREDATE);
     }
     // Agrega más campos de fecha si es necesario
-    
   });
 
   console.log(selectedItem);
@@ -67,10 +67,11 @@ const EmployeeForm = ({
         acc[key] = curr[key];
         return acc;
       }, {});
+      
 
       setFormData({
         EMP_ID: transformedData.EMP_ID || "",
-        USE_ID: transformedData.USE_ID || "",
+        USE_ID: transformedData.USE_ID || null,
         EMP_EMAIL: transformedData.EMP_EMAIL || "",
         EMP_HIREDATE: transformedData.EMP_HIREDATE || "",
         EMP_FIRST_NAME: transformedData.EMP_FIRST_NAME || "",
@@ -128,11 +129,19 @@ const EmployeeForm = ({
     if (response.ok) {
       console.log("Registro guardado correctamente");
 
-      alert("Formulario enviado exitosamente");
+      Swal.fire({
+        title: "Guardado",
+        text: "Registro enviado exitosamente!",
+        icon: "success"
+      });
       onFormSubmit();
       closeModal();
     } else {
-      alert("Error al enviar el formulario");
+        Swal.fire({
+            title: "Oops...",
+            text: "Algo ha salido mal, intenta de nuevo!",
+            icon: "error"
+          });
       console.error("Error al enviar el formulario");
     }
   };
@@ -141,8 +150,19 @@ const EmployeeForm = ({
     <>
       <Form onSubmit={handleSubmit}>
         <div style={formScrollableDiv}>
+          {formData.EMP_ID && (
+            <FormField>
+              <label>ID</label>
+              <input
+                type="text"
+                name="EMP_ID"
+                placeholder="ID"
+                value={formData.EMP_ID}
+                onChange={handleChange}
+              />
+            </FormField>
+          )}
           <FormField>
-            <label>ID</label>
             <input
               type="number"
               name="EMP_ID"
@@ -155,7 +175,7 @@ const EmployeeForm = ({
           <FormField>
             <label>Usuario ID</label>
             <input
-              type="TEXT"
+              type="hidden"
               name="USE_ID"
               placeholder="Usuario ID"
               value={formData.USE_ID}
