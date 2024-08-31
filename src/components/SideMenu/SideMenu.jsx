@@ -8,6 +8,7 @@ import userIcon from '../../assets/user-icon.png';
 import logoSistema from '../../assets/logo-sistema.png';
 import './SideMenu.css';
 import Employee from '../Employee';
+import Service from '../Service';
 
 export default function SideMenu() {
   const [visible, setVisible] = useState(true);
@@ -92,6 +93,7 @@ export default function SideMenu() {
               <Route path="/users" element={<User />} />
               <Route path="/suppliers" element={<Supplier isSidebarVisible={visible}/>} />
               <Route path="/employees" element={<Employee isSidebarVisible={visible}/>} />
+              <Route path="/services" element={<Service isSidebarVisible={visible}/>} />
             </Routes>
           </Segment>
         </Sidebar.Pusher>

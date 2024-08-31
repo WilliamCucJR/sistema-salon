@@ -2,6 +2,7 @@ import { Modal } from "semantic-ui-react";
 import SupplierForm from "../Supplier/SupplierForm";
 import EmployeeForm from "../Employee/EmployeeForm";
 import "./CatalogueModal.css";
+import ServiceForm from "../Service/ServiceForm";
 
 export default function CatalogueModal({
   isModalOpen,
@@ -16,8 +17,10 @@ export default function CatalogueModal({
     if (catalogueType == 'suppliers') {
         catalogueForm = <SupplierForm selectedItem={selectedItem} closeModal={closeModal} onFormSubmit={onFormSubmit} catalogueType={catalogueType} />;
     }else if(catalogueType == 'employees'){
-        catalogueForm = <EmployeeForm selectedItem={selectedItem} closeModal={closeModal} onFormSubmit={onFormSubmit} catalogueType={catalogueType} />;
-    }
+        catalogueForm = <EmployeeForm selectedItem={selectedItem} closeModal={closeModal} onFormSubmit={onFormSubmit} catalogueType={catalogueType} />;    
+    }else if(catalogueType == 'services'){
+        catalogueForm = <ServiceForm selectedItem={selectedItem} closeModal={closeModal} onFormSubmit={onFormSubmit} catalogueType={catalogueType} />;   
+    }    
     // Agrega más tipos de catálogo
 
   return (

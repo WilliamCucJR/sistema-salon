@@ -53,6 +53,15 @@ export default function CatalogueTable({
         "EMP_STATE",
       ],
     },
+    services: {
+      apiFields: ["SER_SERVICENAME", "SER_VALUE"],
+      tableHeaders: ["Servicio", "Valor del Servicio"],
+      formInputs: [
+        "SER_ID",
+        "SER_SERVICENAME",
+        "SER_VALUE",
+      ],
+    },
     // Agrega más tipos de catálogo
   };
 
@@ -60,6 +69,7 @@ export default function CatalogueTable({
     const idFields = {
       suppliers: "SUP_ID",
       employees: "EMP_ID",
+      services: "SER_ID",
       // Agrega más tipos de catálogo
     };
     return idFields[catalogueType];

@@ -100,6 +100,7 @@ const EmployeeForm = ({
     const url = formData.EMP_ID
       ? `${urlBase}${catalogueType}/${formData.EMP_ID}`
       : `${urlBase}${catalogueType}`;
+    const USE_ID = formData.USE_ID === "" ? null : formData.USE_ID;
 
     const response = await fetch(url, {
       method: method,
@@ -107,7 +108,7 @@ const EmployeeForm = ({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        USE_ID: formData.USE_ID,
+        USE_ID: USE_ID,
         EMP_EMAIL: formData.EMP_EMAIL,
         EMP_HIREDATE: formData.EMP_HIREDATE,
         EMP_FIRST_NAME: formData.EMP_FIRST_NAME,
@@ -154,12 +155,11 @@ const EmployeeForm = ({
           <FormField>
             <label>Usuario ID</label>
             <input
-              type="number"
+              type="TEXT"
               name="USE_ID"
               placeholder="Usuario ID"
               value={formData.USE_ID}
               onChange={handleChange}
-              required
             />
           </FormField>
           <FormField>
