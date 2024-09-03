@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FormField, Button, Form } from "semantic-ui-react";
+import { FormField, Button, Form, Grid, TextArea } from "semantic-ui-react";
 import Swal from 'sweetalert2';
 
 const ProductForm = ({
@@ -30,12 +30,6 @@ const ProductForm = ({
     backgroundColor: "#fff",
     color: "#9eb5b0",
     border: "1px solid #9eb5b0",
-  };
-
-  const formScrollableDiv = {
-    height: "400px",
-    overflowY: "scroll",
-    marginBottom: "20px",
   };
 
   useEffect(() => {
@@ -109,91 +103,114 @@ const ProductForm = ({
   return (
     <>
       <Form onSubmit={handleSubmit}>
-        <div style={formScrollableDiv}>
-          <FormField>
-            <label>ID</label>
-            <input
-              type="number"
-              name="PRO_ID"
-              placeholder="ID"
-              value={formData.PRO_ID}
-              onChange={handleChange}
-              readOnly
-            />
-          </FormField>
-          <FormField>
-            <label>Proveedor ID</label>
-            <input
-              type="number"
-              name="SUP_ID"
-              placeholder="Proveedor ID"
-              value={formData.SUP_ID}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <label>Nombre</label>
-            <input
-              type="text"
-              name="PRO_NAME"
-              placeholder="Nombre"
-              value={formData.PRO_NAME}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <label>Medida</label>
-            <input
-              type="number"
-              name="PRO_MEASUREMENT"
-              placeholder="Medida"
-              value={formData.PRO_MEASUREMENT}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <label>Cantidad</label>
-            <input
-              type="number"
-              name="PRO_QUANTITY"
-              placeholder="Cantidad"
-              value={formData.PRO_QUANTITY}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-          <FormField>
-            <label>Valor</label>
-            <input
-              type="number"
-              name="PRO_VALUE"
-              placeholder="Valor"
-              value={formData.PRO_VALUE}
-              onChange={handleChange}
-            />
-          </FormField>
-          <FormField>
-            <label>Descripción</label>
-            <input
-              type="text"
-              name="PRO_DESCRIPTION"
-              placeholder="Descripción"
-              value={formData.PRO_DESCRIPTION}
-              onChange={handleChange}
-              required
-            />
-          </FormField>
-         
+        <Grid>
+          <Grid.Row columns={3}>
+            <Grid.Column width={5}>
+              <FormField>
+                <label>ID</label>
+                <input
+                  type="number"
+                  name="PRO_ID"
+                  placeholder="ID"
+                  value={formData.PRO_ID}
+                  onChange={handleChange}
+                  readOnly
+                />
+              </FormField>
+            </Grid.Column>
+            <Grid.Column width={5}>
+              <FormField>
+                <label>Proveedor ID</label>
+                <input
+                  type="number"
+                  name="SUP_ID"
+                  placeholder="Proveedor ID"
+                  value={formData.SUP_ID}
+                  onChange={handleChange}
+                  required
+                />
+              </FormField>
+            </Grid.Column>
+            <Grid.Column width={6}>
+              <FormField>
+                <label>Nombre</label>
+                <input
+                  type="text"
+                  name="PRO_NAME"
+                  placeholder="Nombre"
+                  value={formData.PRO_NAME}
+                  onChange={handleChange}
+                  required
+                />
+              </FormField>
+            </Grid.Column>
+          </Grid.Row>
+
+          <Grid.Row columns={3}>
+            <Grid.Column width={5}>
+              <FormField>
+                <label>Medida</label>
+                <input
+                  type="number"
+                  name="PRO_MEASUREMENT"
+                  placeholder="Medida"
+                  value={formData.PRO_MEASUREMENT}
+                  onChange={handleChange}
+                  required
+                />
+              </FormField>
+            </Grid.Column>
+            <Grid.Column width={5}>
+              <FormField>
+                <label>Cantidad</label>
+                <input
+                  type="number"
+                  name="PRO_QUANTITY"
+                  placeholder="Cantidad"
+                  value={formData.PRO_QUANTITY}
+                  onChange={handleChange}
+                  required
+                />
+              </FormField>
+            </Grid.Column>
+            <Grid.Column width={6}>
+              <FormField>
+                <label>Valor</label>
+                <input
+                  type="number"
+                  name="PRO_VALUE"
+                  placeholder="Valor"
+                  value={formData.PRO_VALUE}
+                  onChange={handleChange}
+                />
+              </FormField>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row columns={1}>
+            <Grid.Column width={16}>
+              <FormField>
+                <label>Descripción</label>
+                <TextArea
+                  name="PRO_DESCRIPTION"
+                  placeholder="Descripción"
+                  value={formData.PRO_DESCRIPTION}
+                  onChange={handleChange}
+                  required
+                  style={{ minHeight: 100 }}
+                />
+              </FormField>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+
+        <div style={{ marginTop: '20px' }}>
+          <Button type="submit" style={buttonSaveStyle}>
+            Guardar
+          </Button>
+          <Button onClick={closeModal} style={buttonCancelStyle}>
+            Cerrar
+          </Button>
         </div>
-        <Button type="submit" style={buttonSaveStyle}>
-          Guardar
-        </Button>
-        <Button onClick={closeModal} style={buttonCancelStyle}>
-          Cerrar
-        </Button>
       </Form>
     </>
   );

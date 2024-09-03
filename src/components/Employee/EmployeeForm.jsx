@@ -9,8 +9,8 @@ import {
   Select,
   Icon,
 } from "semantic-ui-react";
-import { InputFile } from "semantic-ui-react-input-file";
 import Swal from "sweetalert2";
+import FileInput from '../FileInput/FileInput';
 import guatemalaData from "../../data/guatemala.json";
 
 const EmployeeForm = ({
@@ -513,8 +513,7 @@ const EmployeeForm = ({
       render: () => (
         <Tab.Pane>
           <FormField>
-            <label>Seleccionar Imagen</label>
-            <InputFile
+            <FileInput
               input={{
                 id: "input-file",
               }}

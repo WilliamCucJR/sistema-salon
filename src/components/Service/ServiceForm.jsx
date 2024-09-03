@@ -112,7 +112,7 @@ const ServiceForm = ({ selectedItem, closeModal, onFormSubmit, catalogueType }) 
             <input
               type="TEXT"
               name="SER_SERVICENAME"
-              placeholder="SERVICE NAME"
+              placeholder="Nombre del servicio"
               value={formData.SER_SERVICENAME}
               onChange={handleChange}
               required

@@ -1,0 +1,75 @@
+.FileUpload-Container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.file-btn {
+    width: 350px;
+    height: 250px;
+    font-size: 18px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: #8A3FFC;
+    background-color: #fff;
+    border: 2px dashed #8A3FFC;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-btn:hover {
+    color: #8A3FFC;
+    background-color: #fff;
+}
+
+.file-btn .icon {
+    font-size: 40px; 
+    color: #8A3FFC;
+}
+
+.selected-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f3ecff;
+    border: 1px solid #e8d9fe;
+    border-radius: 20px;
+    margin-top: 20px;
+    width: 350px;
+}
+
+.selected-file p {
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 15px;
+    flex-grow: 1;
+}
+
+.selected-file button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8A3FFC;
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selected-file button .icon {
+    font-size: 20px;
+    margin: 0 0 10px 2px; 
+}
+
+.selected-file button:hover {
+    color: #fff;
+    background-color: #8A3FFC;
+}
