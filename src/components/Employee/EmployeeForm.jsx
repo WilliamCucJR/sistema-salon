@@ -111,17 +111,6 @@ const EmployeeForm = ({
 
   console.log(selectedItem);
 
-  const buttonSaveStyle = {
-    backgroundColor: "#dbac9a",
-    border: "1px solid #dbac9a",
-    color: "white",
-  };
-
-  const buttonCancelStyle = {
-    backgroundColor: "#fff",
-    color: "#9eb5b0",
-    border: "1px solid #9eb5b0",
-  };
 
   const formScrollableDiv = {
     height: "400px",
@@ -547,10 +536,10 @@ const EmployeeForm = ({
       >
         <Tab panes={panes} />
       </div>
-      <Button type="submit" style={buttonSaveStyle}>
+      <Button type="submit" color="teal">
         Guardar
       </Button>
-      <Button onClick={closeModal} style={buttonCancelStyle}>
+      <Button onClick={closeModal} inverted color='brown'>
         Cerrar
       </Button>
     </Form>

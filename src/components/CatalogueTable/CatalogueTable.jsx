@@ -175,7 +175,7 @@ export default function CatalogueTable({
             celled
             striped
             className="table-catalogue"
-            style={{ width: isSidebarVisible ? "75%" : "100%", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)" }}
+            style={{ width: isSidebarVisible ? "100%" : "100%", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)" }}
           >
             <Table.Header>
               <Table.Row>

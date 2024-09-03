@@ -1,109 +1,98 @@
 import { useState } from 'react';
-import { Sidebar, Menu, Icon, Segment, Button, Image } from 'semantic-ui-react';
+import { Sidenav, Nav, Sidebar, Container, Content, IconButton } from 'rsuite';
 import { Link, Routes, Route } from 'react-router-dom';
+import DashboardIcon from '@rsuite/icons/legacy/Dashboard';
+import MagicIcon from '@rsuite/icons/legacy/Magic';
+import ExitIcon from '@rsuite/icons/Exit';
+import PeoplesIcon from '@rsuite/icons/Peoples';
+import PeoplesMapIcon from '@rsuite/icons/PeoplesMap';
+import CalendarIcon from '@rsuite/icons/Calendar';
+import AdminIcon from '@rsuite/icons/Admin';
+import TagIcon from '@rsuite/icons/Tag';
 import Home from '../Home/';
 import User from '../User/';
 import Supplier from '../Supplier';
-import userIcon from '../../assets/user-icon.png';
-import logoSistema from '../../assets/logo-sistema.png';
-import './SideMenu.css';
 import Employee from '../Employee';
 import Service from '../Service';
 import Product from '../Product';
+import userIcon from '../../assets/user-icon.png';
+import logoSistema from '../../assets/logo-sistema.png';
+import './SideMenu.css';
 
 export default function SideMenu() {
-  const [visible, setVisible] = useState(true);
+  const [expanded, setExpanded] = useState(true);
 
-  const toggleSidebar = () => setVisible(!visible);
+  const toggleSidebar = () => setExpanded(!expanded);
 
   return (
-    <div>
-      <div style={{ padding: '5px', backgroundColor: '#e6e6e6', display: 'flex', alignItems: 'center' }}>
-        <Button icon onClick={toggleSidebar} style={{ margin: 0, padding: '5px' }}>
-          <Icon name="bars" size="large" />
-        </Button>
-      </div>
-
-      <Sidebar.Pushable as={Segment} style={{ minHeight: '96vh', margin: 0, display: 'flex' }}>
-        <Sidebar
-          as={Menu}
-          animation="push"
-          inverted
-          vertical
-          visible={visible}
-          className="sidemenu-style"
-          style={{
-            backgroundColor: '#9eb5b0',
-            width: '225px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div>
-            <Menu.Item>
-              <div style={{ textAlign: 'center', padding: '10px' }}>
-                <Image src={userIcon} size="small" circular centered />
-                <p style={{ color: '#000', marginTop: '10px', fontSize: '18px' }}>Administrador</p>
-              </div>
-            </Menu.Item>
-            <Menu.Item as={Link} to="/" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="home" />
-              Inicio
-            </Menu.Item>
-            <Menu.Item as={Link} to="/appointments" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="calendar" />
-              Citas
-            </Menu.Item>
-            <Menu.Item as={Link} to="/clients" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="user" />
-              Clientes
-            </Menu.Item>
-            <Menu.Item as={Link} to="/services" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="shopping bag" />
-              Servicios
-            </Menu.Item>
-            <Menu.Item as={Link} to="/suppliers" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="truck" />
-              Proveedores
-            </Menu.Item>
-            <Menu.Item as={Link} to="/products" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="shopping bag" />
-              Productos
-            </Menu.Item>
-            <Menu.Item as={Link} to="/employees" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="users" />
-              Empleados
-            </Menu.Item>
-            {/* <Menu.Item as={Link} to="/products" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="users" />
-              Productos
-            </Menu.Item> */}
-            <Menu.Item as="a" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="sign-out" />
-              Salir
-            </Menu.Item>
-          </div>
-          <Menu.Item className="bottom-image-container">
-            <div style={{ textAlign: 'center', padding: '10px' }}>
-              <Image src={logoSistema} size="small" centered />
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <Sidebar
+        style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}
+        width={expanded ? 240 : 56}
+        collapsible
+      >
+        <Sidenav expanded={expanded} defaultOpenKeys={['3', '4']} style={{ flex: 1, backgroundColor: '#9eb5b0' }}>
+          <Sidenav.Header>
+            <div style={{ padding: 18, textAlign: 'center' }}>
+              <IconButton
+                icon={<i className="rs-icon rs-icon-bars" />}
+                onClick={toggleSidebar}
+                appearance="subtle"
+                style={{ marginBottom: 10 }}
+              />
+              {expanded && (
+                <div>
+                  <img src={userIcon} alt="User Icon" style={{ width: 50, borderRadius: '50%' }} />
+                  <p style={{ color: '#000', marginTop: '10px', fontSize: '18px' }}>Administrador</p>
+                </div>
+              )}
             </div>
-          </Menu.Item>
-        </Sidebar>
-
-        <Sidebar.Pusher style={{ padding: '20px', flex: 1 }}>
-          <Segment basic>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/users" element={<User />} />
-              <Route path="/suppliers" element={<Supplier isSidebarVisible={visible}/>} />
-              <Route path="/employees" element={<Employee isSidebarVisible={visible}/>} />
-              <Route path="/services" element={<Service isSidebarVisible={visible}/>} />
-              <Route path="/products" element={<Product isSidebarVisible={visible}/>} />
-            </Routes>
-          </Segment>
-        </Sidebar.Pusher>
-      </Sidebar.Pushable>
+          </Sidenav.Header>
+          <Sidenav.Body>
+            <Nav>
+              <Nav.Item as={Link} to="/" eventKey="1" icon={<DashboardIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+                Inicio
+              </Nav.Item>
+              <Nav.Item as={Link} to="/appointments" eventKey="2" icon={<CalendarIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+                Citas
+              </Nav.Item>
+              <Nav.Item as={Link} to="/clients" eventKey="3" icon={<PeoplesIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+                Clientes
+              </Nav.Item>
+              <Nav.Item as={Link} to="/services" eventKey="4" icon={<MagicIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+                Servicios
+              </Nav.Item>
+              <Nav.Item as={Link} to="/suppliers" eventKey="5" icon={<AdminIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+                Proveedores
+              </Nav.Item>
+              <Nav.Item as={Link} to="/products" eventKey="6" icon={<TagIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+                Productos
+              </Nav.Item>
+              <Nav.Item as={Link} to="/employees" eventKey="7" icon={<PeoplesMapIcon />} style={{ backgroundColor: '#9eb5b0' }}>
+                Empleados
+              </Nav.Item>
+              <Nav.Item as={Link} to="/employees" eventKey="8" icon={<ExitIcon />} style={{ backgroundColor: '#9eb5b0' }}>
+                Salir
+              </Nav.Item>
+            </Nav>
+          </Sidenav.Body>
+        </Sidenav>
+        <div style={{ textAlign: 'center', padding: '10px', marginTop: 'auto', backgroundColor: '#9eb5b0' }}>
+          <img src={logoSistema} alt="Logo Sistema" style={{ width: 150 }} />
+        </div>
+      </Sidebar>
+      <Container>
+        <Content style={{ padding: '20px' }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/users" element={<User />} />
+            <Route path="/suppliers" element={<Supplier isSidebarVisible={expanded} />} />
+            <Route path="/employees" element={<Employee isSidebarVisible={expanded} />} />
+            <Route path="/services" element={<Service isSidebarVisible={expanded} />} />
+            <Route path="/products" element={<Product isSidebarVisible={expanded} />} />
+          </Routes>
+        </Content>
+      </Container>
     </div>
   );
 }
