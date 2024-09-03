@@ -63,10 +63,6 @@ export default function SideMenu() {
               <Icon name="shopping bag" />
               Servicios
             </Menu.Item>
-            <Menu.Item as={Link} to="/users" style={{ color: '#000', fontSize: 20 }}>
-              <Icon name="users" />
-              Usuarios
-            </Menu.Item>
             <Menu.Item as={Link} to="/suppliers" style={{ color: '#000', fontSize: 20 }}>
               <Icon name="truck" />
               Proveedores

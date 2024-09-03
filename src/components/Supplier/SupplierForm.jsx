@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
-import { FormField, Button, Form } from "semantic-ui-react";
-import Swal from 'sweetalert2';
+import {
+  FormField,
+  Button,
+  Form,
+  Tab,
+  Select,
+  FormGroup,
+  FormInput,
+} from "semantic-ui-react";
+import Swal from "sweetalert2";
+import guatemalaData from "../../data/guatemala.json";
 
 const SupplierForm = ({
   selectedItem,
@@ -24,23 +33,30 @@ const SupplierForm = ({
     SUP_STATE: "",
   });
 
-  const buttonSaveStyle = {
-    backgroundColor: "#dbac9a",
-    border: "1px solid #dbac9a",
-    color: "white",
-  };
+  const [departamentos, setDepartamentos] = useState([]);
+  const [municipios, setMunicipios] = useState([]);
+  const [selectedDepartamento, setSelectedDepartamento] = useState("");
+  const [selectedMunicipio, setSelectedMunicipio] = useState("");
 
-  const buttonCancelStyle = {
-    backgroundColor: "#fff",
-    color: "#9eb5b0",
-    border: "1px solid #9eb5b0",
-  };
+  useEffect(() => {
+    const departamentosOptions = Object.keys(guatemalaData).map(
+      (departamento) => ({
+        key: departamento,
+        text: departamento,
+        value: departamento,
+      })
+    );
+    setDepartamentos(departamentosOptions);
 
-  const formScrollableDiv = {
-    height: "400px",
-    overflowY: "scroll",
-    marginBottom: "20px",
-  };
+    const allMunicipios = Object.values(guatemalaData)
+      .flat()
+      .map((municipio) => ({
+        key: municipio,
+        text: municipio,
+        value: municipio,
+      }));
+    setMunicipios(allMunicipios);
+  }, []);
 
   useEffect(() => {
     if (selectedItem) {
@@ -63,8 +79,27 @@ const SupplierForm = ({
         SUP_CITY: transformedData.SUP_CITY || "",
         SUP_STATE: transformedData.SUP_STATE || "",
       });
+
+      setSelectedDepartamento(transformedData.SUP_STATE || "");
+      setSelectedMunicipio(transformedData.SUP_CITY || "");
     }
   }, [selectedItem]);
+
+  const handleDepartamentoChange = (e, { value }) => {
+    setSelectedDepartamento(value);
+    const municipiosOptions = guatemalaData[value].map((municipio) => ({
+      key: municipio,
+      text: municipio,
+      value: municipio,
+    }));
+    setMunicipios(municipiosOptions);
+    setFormData({ ...formData, SUP_STATE: value, SUP_CITY: "" });
+  };
+
+  const handleMunicipioChange = (e, { value }) => {
+    setSelectedMunicipio(value);
+    setFormData({ ...formData, SUP_CITY: value });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,6 +108,33 @@ const SupplierForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Mapeo de nombres de campos a textos de labels
+    const fieldLabels = {
+      SUP_NIT: "NIT",
+      SUP_SOCIAL_NAME: "Razón Social",
+      SUP_NAME: "Nombre",
+      SUP_FIRST_LINE: "Primera Línea",
+      SUP_SECOND_LINE: "Segunda Línea",
+      SUP_RESIDENTIARY: "Residencial",
+      SUP_AVENUE: "Avenida",
+      SUP_ZONE: "Zona",
+      SUP_CITY: "Municipio",
+      SUP_STATE: "Departamento",
+    };
+
+    const Fields = Object.keys(fieldLabels);
+
+    for (const field of Fields) {
+      if (!formData[field]) {
+        Swal.fire({
+          title: "Error",
+          text: `El campo ${fieldLabels[field]} es obligatorio.`,
+          icon: "error",
+        });
+        return;
+      }
+    }
 
     const method = formData.SUP_ID ? "PUT" : "POST";
     const url = formData.SUP_ID
@@ -104,155 +166,179 @@ const SupplierForm = ({
       Swal.fire({
         title: "Guardado",
         text: "Registro enviado exitosamente!",
-        icon: "success"
+        icon: "success",
       });
       onFormSubmit();
       closeModal();
     } else {
-        Swal.fire({
-            title: "Oops...",
-            text: "Algo ha salido mal, intenta de nuevo!",
-            icon: "error"
-          });
+      Swal.fire({
+        title: "Oops...",
+        text: "Algo ha salido mal, intenta de nuevo!",
+        icon: "error",
+      });
       console.error("Error al enviar el formulario");
     }
   };
 
-  return (
-    <>
-      <Form onSubmit={handleSubmit}>
-        <div style={formScrollableDiv}>
-          {formData.SUP_ID && (
-            <FormField>
-              <label>ID</label>
-              <input
-                type="number"
-                name="SUP_ID"
-                placeholder="ID"
-                value={formData.SUP_ID}
-                onChange={handleChange}
-              />
-            </FormField>
-          )}
-          <FormField>
-            <label>NIT</label>
-            <input
+  const panes = [
+    {
+      menuItem: "Datos Generales",
+      render: () => (
+        <Tab.Pane>
+          <FormGroup widths="equal">
+            <FormInput
+              fluid
+              label="ID"
+              type="number"
+              name="SUP_ID"
+              placeholder="ID"
+              value={formData.SUP_ID}
+              onChange={handleChange}
+              readOnly
+            />
+            <FormInput
+              fluid
+              label="NIT"
               type="text"
               name="SUP_NIT"
               placeholder="NIT"
               value={formData.SUP_NIT}
-              onChange={handleChange}
-              required
+              onChange={(e) => {
+                const { value } = e.target;
+                if (/^[a-zA-Z0-9]{0,10}$/.test(value)) {
+                  handleChange(e, { name: "SUP_NIT", value });
+                }
+              }}
             />
-          </FormField>
-          <FormField>
-            <label>Nombre Social</label>
-            <input
+          </FormGroup>
+
+          <FormGroup widths="equal">
+            <FormInput
+              fluid
+              label="Razón Social"
               type="text"
               name="SUP_SOCIAL_NAME"
-              placeholder="Nombre Social"
+              placeholder="Razón Social"
               value={formData.SUP_SOCIAL_NAME}
               onChange={handleChange}
-              required
+              width={18}
             />
-          </FormField>
-          <FormField>
-            <label>Nombre</label>
-            <input
+          </FormGroup>
+          <FormGroup widths="equal">
+            <FormInput
+              fluid
+              label="Nombre Comercial"
               type="text"
               name="SUP_NAME"
               placeholder="Nombre"
               value={formData.SUP_NAME}
               onChange={handleChange}
-              required
+              width={18}
             />
-          </FormField>
-          <FormField>
-            <label>Primera Linea</label>
-            <input
+          </FormGroup>
+        </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: "Dirección",
+      render: () => (
+        <Tab.Pane>
+          <FormGroup>
+            <FormInput
+              label="Primera Linea"
               type="text"
               name="SUP_FIRST_LINE"
               placeholder="Primera Linea"
               value={formData.SUP_FIRST_LINE}
               onChange={handleChange}
-              required
+              width={8}
             />
-          </FormField>
-          <FormField>
-            <label>Segunda Linea</label>
-            <input
+            <FormInput
+              label="Segunda Linea"
               type="text"
               name="SUP_SECOND_LINE"
               placeholder="Segunda Linea"
               value={formData.SUP_SECOND_LINE}
               onChange={handleChange}
-              required
+              width={8}
             />
-          </FormField>
-          <FormField>
-            <label>Residencial</label>
-            <input
+          </FormGroup>
+          <FormGroup>
+            <FormInput
+              label="Residencial"
               type="text"
               name="SUP_RESIDENTIARY"
               placeholder="Residencial"
               value={formData.SUP_RESIDENTIARY}
               onChange={handleChange}
-              required
+              width={7}
             />
-          </FormField>
-          <FormField>
-            <label>Avenida</label>
-            <input
+            <FormInput
+              label="Avenida"
               type="text"
               name="SUP_AVENUE"
               placeholder="Avenida"
               value={formData.SUP_AVENUE}
               onChange={handleChange}
-              required
+              width={7}
             />
-          </FormField>
-          <FormField>
-            <label>Zona</label>
-            <input
+            <FormInput
+              label="Zona"
               type="number"
               name="SUP_ZONE"
               placeholder="Zona"
               value={formData.SUP_ZONE}
               onChange={handleChange}
-              required
+              width={4}
             />
-          </FormField>
-          <FormField>
-            <label>Ciudad</label>
-            <input
-              type="text"
-              name="SUP_CITY"
-              placeholder="Ciudad"
-              value={formData.SUP_CITY}
-              onChange={handleChange}
-              required
+          </FormGroup>
+          <FormGroup>
+            <FormField
+              control={Select}
+              options={departamentos}
+              label={{
+                children: "Departamento",
+                htmlFor: "form-select-control-departamento",
+              }}
+              placeholder="Selecciona Departamento"
+              search
+              searchInput={{ id: "form-select-control-departamento" }}
+              value={selectedDepartamento}
+              onChange={handleDepartamentoChange}
+              width={9}
             />
-          </FormField>
-          <FormField>
-            <label>Estado</label>
-            <input
-              type="text"
-              name="SUP_STATE"
-              placeholder="Estado"
-              value={formData.SUP_STATE}
-              onChange={handleChange}
-              required
+            <FormField
+              control={Select}
+              options={municipios}
+              label={{
+                children: "Municipio",
+                htmlFor: "form-select-control-municipio",
+              }}
+              placeholder="Selecciona Municipio"
+              search
+              searchInput={{ id: "form-select-control-municipio" }}
+              value={selectedMunicipio}
+              onChange={handleMunicipioChange}
+              width={9}
             />
-          </FormField>
-        </div>
-        <Button type="submit" style={buttonSaveStyle}>
-          Guardar
-        </Button>
-        <Button onClick={closeModal} style={buttonCancelStyle}>
-          Cerrar
-        </Button>
-      </Form>
-    </>
+          </FormGroup>
+        </Tab.Pane>
+      ),
+    },
+  ];
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <div style={{ height: "400px", overflowY: "auto" }}>
+        <Tab panes={panes} />
+      </div>
+      <Button type="submit" color="teal">
+        Guardar
+      </Button>
+      <Button onClick={closeModal} inverted color='brown'>
+        Cerrar
+      </Button>
+    </Form>
   );
 };
 

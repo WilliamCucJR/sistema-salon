@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Table, Button } from "semantic-ui-react";
+import { Table, Button, Icon } from "semantic-ui-react";
 import "./CatalogueTable.css";
 import Swal from 'sweetalert2';
 
@@ -52,6 +52,10 @@ export default function CatalogueTable({
         "EMP_ZONE",
         "EMP_CITY",
         "EMP_STATE",
+        "EMP_GENDER",
+        "EMP_CELLPHONE",
+        "EMP_NIT",
+        "EMP_DATE_OF_BIRTH",
       ],
     },
     services: {
@@ -158,9 +162,10 @@ export default function CatalogueTable({
     <>
       <Button
         onClick={() => handleOpenModal(null)}
-        style={{ marginBottom: "20px" }}
+        style={{ marginBottom: "20px", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)" }}
+        color="teal"
       >
-        Agregar +
+        <Icon name="plus" /> Agregar
       </Button>
       <div className="scrollable-div-table">
         {error ? (
@@ -170,7 +175,7 @@ export default function CatalogueTable({
             celled
             striped
             className="table-catalogue"
-            style={{ width: isSidebarVisible ? "75%" : "100%" }}
+            style={{ width: isSidebarVisible ? "75%" : "100%", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)" }}
           >
             <Table.Header>
               <Table.Row>
@@ -188,10 +193,12 @@ export default function CatalogueTable({
                     <Table.Cell key={index}>{item[field]}</Table.Cell>
                   ))}
                   <Table.Cell style={{ textAlign: "center" }}>
-                    <Button onClick={() => handleOpenModal(item)} icon="edit" />
+                    <Button onClick={() => handleOpenModal(item)} icon="edit" color="yellow" style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)", marginRight: "10px" }} />
                     <Button
                       onClick={() => handleDelete(item[idField])}
                       icon="trash alternate"
+                      color="red"
+                      style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)", marginLeft: "10px" }}
                     />
                   </Table.Cell>
                 </Table.Row>
