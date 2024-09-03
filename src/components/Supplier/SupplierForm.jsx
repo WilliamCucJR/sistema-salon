@@ -7,6 +7,7 @@ import {
   Select,
   FormGroup,
   FormInput,
+  Icon,
 } from "semantic-ui-react";
 import Swal from "sweetalert2";
 import guatemalaData from "../../data/guatemala.json";
@@ -333,10 +334,10 @@ const SupplierForm = ({
         <Tab panes={panes} />
       </div>
       <Button type="submit" color="teal">
-        Guardar
+        <Icon name="save" /> Guardar
       </Button>
       <Button onClick={closeModal} inverted color='brown'>
-        Cerrar
+        <Icon name="close" /> Cerrar
       </Button>
     </Form>
   );

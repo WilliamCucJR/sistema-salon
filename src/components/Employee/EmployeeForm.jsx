@@ -7,6 +7,7 @@ import {
   FormGroup,
   FormInput,
   Select,
+  Icon,
 } from "semantic-ui-react";
 import { InputFile } from "semantic-ui-react-input-file";
 import Swal from "sweetalert2";
@@ -537,10 +538,10 @@ const EmployeeForm = ({
         <Tab panes={panes} />
       </div>
       <Button type="submit" color="teal">
-        Guardar
+        <Icon name="save" /> Guardar
       </Button>
       <Button onClick={closeModal} inverted color='brown'>
-        Cerrar
+        <Icon name="close" /> Cerrar
       </Button>
     </Form>
   );
