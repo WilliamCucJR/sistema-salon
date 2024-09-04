@@ -21,6 +21,9 @@ const EmployeeForm = ({
 }) => {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
 
+  console.log(selectedItem);
+  
+
   selectedItem.forEach((employee) => {
     const formatDate = (dateString) => {
       const date = new Date(dateString);
@@ -37,6 +40,10 @@ const EmployeeForm = ({
     // Agrega más campos de fecha si es necesario
   });
 
+  const handleFileSelect = (file) => {
+    setSelectedFile(file);
+  };
+
   const today = new Date();
   const maxDate = new Date(
     today.getFullYear() - 18,
@@ -50,6 +57,7 @@ const EmployeeForm = ({
   const [municipios, setMunicipios] = useState([]);
   const [selectedDepartamento, setSelectedDepartamento] = useState("");
   const [selectedMunicipio, setSelectedMunicipio] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null); // Estado para el archivo seleccionado
 
   useEffect(() => {
     const departamentosOptions = Object.keys(guatemalaData).map(
@@ -112,7 +120,6 @@ const EmployeeForm = ({
 
   console.log(selectedItem);
 
-
   const formScrollableDiv = {
     height: "400px",
     overflowY: "hidden",
@@ -121,7 +128,6 @@ const EmployeeForm = ({
 
   const [formData, setFormData] = useState({
     EMP_ID: "",
-    USE_ID: "",
     EMP_EMAIL: "",
     EMP_HIREDATE: "",
     EMP_FIRST_NAME: "",
@@ -139,6 +145,7 @@ const EmployeeForm = ({
     EMP_ZONE: "",
     EMP_CITY: "",
     EMP_STATE: "",
+    EMP_IMAGEN: "",
   });
 
   useEffect(() => {
@@ -151,7 +158,6 @@ const EmployeeForm = ({
 
       setFormData({
         EMP_ID: transformedData.EMP_ID || "",
-        USE_ID: transformedData.USE_ID || null,
         EMP_EMAIL: transformedData.EMP_EMAIL || "",
         EMP_HIREDATE: transformedData.EMP_HIREDATE || "",
         EMP_FIRST_NAME: transformedData.EMP_FIRST_NAME || "",
@@ -169,6 +175,7 @@ const EmployeeForm = ({
         EMP_ZONE: transformedData.EMP_ZONE || "",
         EMP_CITY: transformedData.EMP_CITY || "",
         EMP_STATE: transformedData.EMP_STATE || "",
+        EMP_IMAGEN: transformedData.EMP_IMAGEN || "",
       });
 
       setSelectedDepartamento(transformedData.EMP_STATE || "");
@@ -202,52 +209,78 @@ const EmployeeForm = ({
       EMP_ZONE: "Zona",
       EMP_CITY: "Municipio",
       EMP_STATE: "Departamento",
+      EMP_IMAGEN: "Imagen",
     };
 
-    const Fields = Object.keys(fieldLabels);
+    // Validación de campos requeridos
+    const requiredFields = [
+      "EMP_EMAIL",
+      "EMP_HIREDATE",
+      "EMP_FIRST_NAME",
+      "EMP_MIDDLE_NAME",
+      "EMP_LAST_NAME",
+      "EMP_SECONDLAST_NAME",
+      "EMP_GENDER",
+      "EMP_CELLPHONE",
+      "EMP_NIT",
+      "EMP_DATE_OF_BIRTH",
+      "EMP_FIRST_LINE",
+      "EMP_SECOND_LINE",
+      "EMP_RESIDENTIARY",
+      "EMP_AVENUE",
+      "EMP_ZONE",
+      "EMP_CITY",
+      "EMP_STATE",
+    ];
 
-    for (const field of Fields) {
-      if (!formData[field]) {
-        Swal.fire({
-          title: "Error",
-          text: `El campo ${fieldLabels[field]} es obligatorio.`,
-          icon: "error",
-        });
-        return;
-      }
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field]
+    );
+
+    if (missingFields.length > 0) {
+      const missingFieldLabels = missingFields.map(
+        (field) => fieldLabels[field]
+      );
+      Swal.fire({
+        title: "Error",
+        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+        icon: "error",
+      });
+      return;
     }
 
+    // Lógica para enviar los datos al API
     const method = formData.EMP_ID ? "PUT" : "POST";
     const url = formData.EMP_ID
       ? `${urlBase}${catalogueType}/${formData.EMP_ID}`
       : `${urlBase}${catalogueType}`;
-    const USE_ID = formData.USE_ID === "" ? null : formData.USE_ID;
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("EMP_EMAIL", formData.EMP_EMAIL);
+    formDataToSend.append("EMP_HIREDATE", formData.EMP_HIREDATE);
+    formDataToSend.append("EMP_FIRST_NAME", formData.EMP_FIRST_NAME);
+    formDataToSend.append("EMP_MIDDLE_NAME", formData.EMP_MIDDLE_NAME);
+    formDataToSend.append("EMP_LAST_NAME", formData.EMP_LAST_NAME);
+    formDataToSend.append("EMP_SECONDLAST_NAME", formData.EMP_SECONDLAST_NAME);
+    formDataToSend.append("EMP_GENDER", formData.EMP_GENDER);
+    formDataToSend.append("EMP_CELLPHONE", formData.EMP_CELLPHONE);
+    formDataToSend.append("EMP_NIT", formData.EMP_NIT);
+    formDataToSend.append("EMP_DATE_OF_BIRTH", formData.EMP_DATE_OF_BIRTH);
+    formDataToSend.append("EMP_FIRST_LINE", formData.EMP_FIRST_LINE);
+    formDataToSend.append("EMP_SECOND_LINE", formData.EMP_SECOND_LINE);
+    formDataToSend.append("EMP_RESIDENTIARY", formData.EMP_RESIDENTIARY);
+    formDataToSend.append("EMP_AVENUE", formData.EMP_AVENUE);
+    formDataToSend.append("EMP_ZONE", formData.EMP_ZONE);
+    formDataToSend.append("EMP_CITY", formData.EMP_CITY);
+    formDataToSend.append("EMP_STATE", formData.EMP_STATE);
+
+    if (selectedFile) {
+      formDataToSend.append("EMP_IMAGEN", selectedFile);
+    }
 
     const response = await fetch(url, {
       method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        USE_ID: USE_ID,
-        EMP_EMAIL: formData.EMP_EMAIL,
-        EMP_HIREDATE: formData.EMP_HIREDATE,
-        EMP_FIRST_NAME: formData.EMP_FIRST_NAME,
-        EMP_MIDDLE_NAME: formData.EMP_MIDDLE_NAME,
-        EMP_LAST_NAME: formData.EMP_LAST_NAME,
-        EMP_SECONDLAST_NAME: formData.EMP_SECONDLAST_NAME,
-        EMP_GENDER: formData.EMP_GENDER,
-        EMP_CELLPHONE: formData.EMP_CELLPHONE,
-        EMP_NIT: formData.EMP_NIT,
-        EMP_DATE_OF_BIRTH: formData.EMP_DATE_OF_BIRTH,
-        EMP_FIRST_LINE: formData.EMP_FIRST_LINE,
-        EMP_SECOND_LINE: formData.EMP_SECOND_LINE,
-        EMP_RESIDENTIARY: formData.EMP_RESIDENTIARY,
-        EMP_AVENUE: formData.EMP_AVENUE,
-        EMP_ZONE: formData.EMP_ZONE,
-        EMP_CITY: formData.EMP_CITY,
-        EMP_STATE: formData.EMP_STATE,
-      }),
+      body: formDataToSend,
     });
 
     if (response.ok) {
@@ -293,11 +326,12 @@ const EmployeeForm = ({
           <FormGroup widths="equal" style={{ display: "none" }}>
             <FormInput
               fluid
-              label="ID USUARIO"
-              name="USE_ID"
-              placeholder="Usuario ID"
-              value={formData.USE_ID}
+              label="IMAGEN"
+              name="EMP_IMAGEN"
+              placeholder="Imagen"
+              value={formData.EMP_IMAGEN}
               onChange={handleChange}
+              readOnly
             />
           </FormGroup>
           <Form>
@@ -482,6 +516,7 @@ const EmployeeForm = ({
               label={{
                 children: "Departamento",
                 htmlFor: "form-select-control-departamento",
+             
               }}
               placeholder="Selecciona Departamento"
               search
@@ -517,6 +552,7 @@ const EmployeeForm = ({
               input={{
                 id: "input-file",
               }}
+              onFileSelect={handleFileSelect}
             />
           </FormField>
         </Tab.Pane>

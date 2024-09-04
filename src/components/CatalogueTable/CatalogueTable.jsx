@@ -38,7 +38,6 @@ export default function CatalogueTable({
       tableHeaders: ["Nombre", "Apellido", "Email", "Ciudad"],
       formInputs: [
         "EMP_ID",
-        "USE_ID",
         "EMP_EMAIL",
         "EMP_HIREDATE",
         "EMP_FIRST_NAME",
@@ -56,6 +55,7 @@ export default function CatalogueTable({
         "EMP_CELLPHONE",
         "EMP_NIT",
         "EMP_DATE_OF_BIRTH",
+        "EMP_IMAGEN"
       ],
     },
     services: {
@@ -103,6 +103,8 @@ export default function CatalogueTable({
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      console.log("Data", data);
+      
       setCatalogue(data);
     } catch (error) {
       console.log(

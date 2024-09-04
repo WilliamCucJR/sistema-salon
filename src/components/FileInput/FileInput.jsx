@@ -1,23 +1,28 @@
 import { useRef, useState } from "react";
 import "./FileInput.css";
-import { Icon, } from 'semantic-ui-react'; 
+import { Icon } from 'semantic-ui-react'; 
 
-const FileInput = () => {
+const FileInput = ({ onFileSelect }) => {
   const inputRef = useRef();
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleOnChange = (event) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+      setSelectedFile(file);
+      onFileSelect(file);
     }
   };
 
-  const onChooseFile = () => {
+  const onChooseFile = (event) => {
+    event.preventDefault();
     inputRef.current.click();
   };
 
-  const removeFile = () => {
+  const removeFile = (event) => {
+    event.preventDefault();
     setSelectedFile(null);
+    onFileSelect(null);
   };
 
   return (
