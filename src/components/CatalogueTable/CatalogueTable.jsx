@@ -84,6 +84,7 @@ export default function CatalogueTable({
         "SER_ID",
         "SER_SERVICENAME",
         "SER_VALUE",
+        "SER_IMAGEN",
       ],
     },  
     products: {
