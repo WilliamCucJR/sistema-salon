@@ -97,6 +97,7 @@ export default function CatalogueTable({
         "PRO_QUANTITY",
         "PRO_VALUE",
         "PRO_DESCRIPTION",
+        "PRO_IMAGEN",
       ],
     },
     // Agrega más tipos de catálogo

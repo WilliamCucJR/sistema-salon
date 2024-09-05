@@ -19,6 +19,22 @@ const CustomerForm = ({
   catalogueType,
 }) => {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
+  const urlFile = import.meta.env.VITE_DEVELOP_URL_FILE;
+  let previewFile = ''
+  const previewImg = 'uploads/img_preview.png'
+
+  // Buscar el objeto que contiene CUS_IMAGEN
+  const imagenObj = selectedItem.find(item => item.CUS_IMAGEN);
+  const imagenPath = imagenObj ? imagenObj.CUS_IMAGEN : null;
+
+  if (imagenPath) {
+    previewFile = `${urlFile}${imagenPath}`;
+  } else {
+    previewFile = `${urlFile}${previewImg}`;
+  }
+
+  console.log(selectedItem);
+  console.log(previewFile);
 
   selectedItem.forEach((customer) => {
     const formatDate = (dateString) => {
@@ -74,7 +90,7 @@ const CustomerForm = ({
     CUS_CELLPHONE: "",
     CUS_NIT: "",
     CUS_DATE_OF_BIRTH: "",
-    //CUS_IMAGEN: "",
+    CUS_IMAGEN: "",
   });
 
   useEffect(() => {
@@ -97,7 +113,7 @@ const CustomerForm = ({
         CUS_CELLPHONE: transformedData.CUS_CELLPHONE || "",
         CUS_NIT: transformedData.CUS_NIT || "",
         CUS_DATE_OF_BIRTH: transformedData.CUS_DATE_OF_BIRTH || "",
-        //CUS_IMAGEN: transformedData.CUS_IMAGEN || "",
+        CUS_IMAGEN: transformedData.CUS_IMAGEN || "",
         CUS_AFFILIATE: transformedData.CUS_AFFILIATE || "",
         
       });
@@ -125,7 +141,7 @@ const CustomerForm = ({
       CUS_CELLPHONE: "Teléfono",
       CUS_NIT: "NIT",
       CUS_DATE_OF_BIRTH: "Fecha de nacimiento",
-      //CUS_IMAGEN: "Imagen",
+      CUS_IMAGEN: "Imagen",
       CUS_AFFILIATE: "Afiliacion",
 
     };
@@ -140,7 +156,6 @@ const CustomerForm = ({
     "CUS_CELLPHONE",
     "CUS_NIT",
     "CUS_DATE_OF_BIRTH",
-    //"CUS_IMAGEN",
     "CUS_AFFILIATE",
   ];
 
@@ -178,9 +193,9 @@ const CustomerForm = ({
   formDataToSend.append("CUS_DATE_OF_BIRTH", formData.CUS_DATE_OF_BIRTH);
   formDataToSend.append("CUS_AFFILIATE", formData.CUS_AFFILIATE);
 
-  //if (selectedFile) {
-  //  formDataToSend.append("CUS_IMAGEN", selectedFile);
-  //}
+  if (selectedFile) {
+   formDataToSend.append("CUS_IMAGEN", selectedFile);
+  }
 
   const response = await fetch(url, {
     method: method,
@@ -225,6 +240,17 @@ const CustomerForm = ({
                 width={8}
               />
             )}
+          </FormGroup>
+          <FormGroup widths="equal" style={{ display: "none" }}>
+            <FormInput
+              fluid
+              label="IMAGEN"
+              name="CUS_IMAGEN"
+              placeholder="Imagen"
+              value={formData.CUS_IMAGEN}
+              onChange={handleChange}
+              readOnly
+            />
           </FormGroup>
           <FormGroup widths="equal" style={{ display: "none" }}>
             <FormInput
@@ -366,9 +392,13 @@ const CustomerForm = ({
     },
     
     {
-        menuItem: "Otros",
+        menuItem: "imagen",
         render: () => (
           <Tab.Pane>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <FormField style={{ marginRight: '125px', marginLeft: '25px' }}>
+              <img src={previewFile} alt="Preview" width={100} />
+            </FormField>
             <FormField>
               <FileInput
                 input={{
@@ -377,7 +407,8 @@ const CustomerForm = ({
                 onFileSelect={handleFileSelect}
               />
             </FormField>
-          </Tab.Pane>
+          </div>
+        </Tab.Pane>
         ),
       },
     ];
