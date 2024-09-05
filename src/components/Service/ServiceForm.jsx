@@ -35,6 +35,10 @@ const ServiceForm = ({
   console.log(selectedItem);
   console.log(previewFile);
 
+  const handleFileSelect = (file) => {
+    setSelectedFile(file);
+  };
+  const [selectedFile, setSelectedFile] = useState(null); // Estado para el archivo seleccionado
   const [formData, setFormData] = useState({
     SER_ID: "",
     SER_SERVICENAME: "",
@@ -42,11 +46,6 @@ const ServiceForm = ({
     SER_IMAGEN:"",
   });
 
-  const handleFileSelect = (file) => {
-    setSelectedFile(file);
-  };
-  const [selectedFile, setSelectedFile] = useState(null); // Estado para el archivo seleccionado
-  
   const formScrollableDiv = {
     height: "400px",
     overflowY: "scroll",
@@ -66,7 +65,7 @@ const ServiceForm = ({
         SER_ID: transformedData.SER_ID || "",
         SER_SERVICENAME: transformedData.SER_SERVICENAME || "",
         SER_VALUE: transformedData.SER_VALUE || "",
-        SER_IMAGEN: transformedData.EMP_IMAGEN || "",
+        SER_IMAGEN: transformedData.SER_IMAGEN || "",
       });
     }
   }, [selectedItem]);
@@ -97,7 +96,6 @@ const ServiceForm = ({
     const requiredFields = [
       "SER_SERVICENAME",
       "SER_VALUE",
-      "SER_IMAGEN",
     ];
   
     const missingFields = requiredFields.filter(
