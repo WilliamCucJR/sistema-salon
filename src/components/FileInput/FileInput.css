@@ -14,22 +14,22 @@
     align-items: center;
     justify-content: center;
     gap: 15px;
-    color: #8A3FFC;
+    color: #02b5ad;
     background-color: #fff;
-    border: 2px dashed #8A3FFC;
+    border: 2px dashed #02b5ad;
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .file-btn:hover {
-    color: #8A3FFC;
+    color: #02b5ad;
     background-color: #fff;
 }
 
 .file-btn .icon {
     font-size: 40px; 
-    color: #8A3FFC;
+    color: #02b5ad;
 }
 
 .selected-file {
@@ -56,7 +56,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8A3FFC;
+    color: #02b5ad;
     background-color: transparent;
     border: none;
     border-radius: 50%;
@@ -71,5 +71,5 @@
 
 .selected-file button:hover {
     color: #fff;
-    background-color: #8A3FFC;
+    background-color: #02b5ad;
 }

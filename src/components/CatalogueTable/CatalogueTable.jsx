@@ -18,7 +18,7 @@ export default function CatalogueTable({
   const catalogueFields = {
     suppliers: {
       apiFields: ["SUP_SOCIAL_NAME", "SUP_NIT", "SUP_RESIDENTIARY", "SUP_CITY"],
-      tableHeaders: ["Nombre Social", "NIT", "Residencial", "Ciudad"],
+      tableHeaders: ["Razón Social", "NIT", "Residencial", "Ciudad"],
       formInputs: [
         "SUP_ID",
         "SUP_NIT",

@@ -32,6 +32,7 @@ const FileInput = ({ onFileSelect }) => {
         ref={inputRef}
         onChange={handleOnChange}
         style={{ display: "none" }}
+        accept="image/*"
       />
 
       <button className="file-btn" onClick={onChooseFile}>

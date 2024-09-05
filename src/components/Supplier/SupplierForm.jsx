@@ -109,8 +109,7 @@ const SupplierForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Mapeo de nombres de campos a textos de labels
+  
     const fieldLabels = {
       SUP_NIT: "NIT",
       SUP_SOCIAL_NAME: "Razón Social",
@@ -123,25 +122,31 @@ const SupplierForm = ({
       SUP_CITY: "Municipio",
       SUP_STATE: "Departamento",
     };
-
-    const Fields = Object.keys(fieldLabels);
-
-    for (const field of Fields) {
-      if (!formData[field]) {
-        Swal.fire({
-          title: "Error",
-          text: `El campo ${fieldLabels[field]} es obligatorio.`,
-          icon: "error",
-        });
-        return;
-      }
+  
+    // Validación de campos requeridos
+    const requiredFields = Object.keys(fieldLabels);
+  
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field]
+    );
+  
+    if (missingFields.length > 0) {
+      const missingFieldLabels = missingFields.map(
+        (field) => fieldLabels[field]
+      );
+      Swal.fire({
+        title: "Error",
+        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+        icon: "error",
+      });
+      return;
     }
-
+  
     const method = formData.SUP_ID ? "PUT" : "POST";
     const url = formData.SUP_ID
       ? `${urlBase}${catalogueType}/${formData.SUP_ID}`
       : `${urlBase}${catalogueType}`;
-
+  
     const response = await fetch(url, {
       method: method,
       headers: {
@@ -160,10 +165,10 @@ const SupplierForm = ({
         SUP_STATE: formData.SUP_STATE,
       }),
     });
-
+  
     if (response.ok) {
       console.log("Registro guardado correctamente");
-
+  
       Swal.fire({
         title: "Guardado",
         text: "Registro enviado exitosamente!",
@@ -186,17 +191,20 @@ const SupplierForm = ({
       menuItem: "Datos Generales",
       render: () => (
         <Tab.Pane>
-          <FormGroup widths="equal">
-            <FormInput
-              fluid
-              label="ID"
-              type="number"
-              name="SUP_ID"
-              placeholder="ID"
-              value={formData.SUP_ID}
-              onChange={handleChange}
-              readOnly
-            />
+          <FormGroup>
+            {formData.SUP_ID && (
+              <FormInput
+                fluid
+                label="ID"
+                type="number"
+                name="SUP_ID"
+                placeholder="ID"
+                value={formData.SUP_ID}
+                onChange={handleChange}
+                readOnly
+                width={9}
+              />
+            )}
             <FormInput
               fluid
               label="NIT"
@@ -206,10 +214,11 @@ const SupplierForm = ({
               value={formData.SUP_NIT}
               onChange={(e) => {
                 const { value } = e.target;
-                if (/^[a-zA-Z0-9]{0,10}$/.test(value)) {
+                if (/^[a-zA-Z0-9-]{0,10}$/.test(value)) {
                   handleChange(e, { name: "SUP_NIT", value });
                 }
               }}
+              width={9}
             />
           </FormGroup>
 
@@ -285,11 +294,15 @@ const SupplierForm = ({
             />
             <FormInput
               label="Zona"
-              type="number"
+              type="text"
               name="SUP_ZONE"
               placeholder="Zona"
               value={formData.SUP_ZONE}
-              onChange={handleChange}
+              onChange={(e, { value }) => {
+                if (/^\d{0,2}$/.test(value)) {
+                  handleChange(e, { name: "SUP_ZONE", value });
+                }
+              }}
               width={4}
             />
           </FormGroup>
@@ -336,7 +349,7 @@ const SupplierForm = ({
       <Button type="submit" color="teal">
         <Icon name="save" /> Guardar
       </Button>
-      <Button onClick={closeModal} inverted color='brown'>
+      <Button onClick={closeModal} inverted color="brown">
         <Icon name="close" /> Cerrar
       </Button>
     </Form>

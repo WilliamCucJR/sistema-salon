@@ -20,8 +20,24 @@ const EmployeeForm = ({
   catalogueType,
 }) => {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
+  const urlFile = import.meta.env.VITE_DEVELOP_URL_FILE;
+  let previewFile = ''
+  const previewImg = 'uploads/img_preview.png'
 
+  // Buscar el objeto que contiene EMP_IMAGEN
+  const imagenObj = selectedItem.find(item => item.EMP_IMAGEN);
+  const imagenPath = imagenObj ? imagenObj.EMP_IMAGEN : null;
+
+  if (imagenPath) {
+    previewFile = `${urlFile}${imagenPath}`;
+  } else {
+    previewFile = `${urlFile}${previewImg}`;
+  }
+  
   console.log(selectedItem);
+
+  console.log(previewFile);
+  
   
 
   selectedItem.forEach((employee) => {
@@ -50,8 +66,30 @@ const EmployeeForm = ({
     today.getMonth(),
     today.getDate()
   )
-    .toISOString()
-    .split("T")[0];
+
+  .toISOString()
+  .split("T")[0];
+
+  const maxDateContrato = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() + 30
+  )
+
+  const minDateContrato = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  )
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  };
+
+  const maxDateC = formatDate(maxDateContrato);
+  const minDateC = formatDate(minDateContrato);
+
 
   const [departamentos, setDepartamentos] = useState([]);
   const [municipios, setMunicipios] = useState([]);
@@ -189,7 +227,7 @@ const EmployeeForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Mapeo de nombres de campos a textos de labels
     const fieldLabels = {
       EMP_EMAIL: "Correo",
@@ -211,7 +249,7 @@ const EmployeeForm = ({
       EMP_STATE: "Departamento",
       EMP_IMAGEN: "Imagen",
     };
-
+  
     // Validación de campos requeridos
     const requiredFields = [
       "EMP_EMAIL",
@@ -232,11 +270,11 @@ const EmployeeForm = ({
       "EMP_CITY",
       "EMP_STATE",
     ];
-
+  
     const missingFields = requiredFields.filter(
       (field) => !formData[field]
     );
-
+  
     if (missingFields.length > 0) {
       const missingFieldLabels = missingFields.map(
         (field) => fieldLabels[field]
@@ -248,13 +286,24 @@ const EmployeeForm = ({
       });
       return;
     }
-
+  
+    // Validación de formato de correo electrónico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.EMP_EMAIL)) {
+      Swal.fire({
+        title: "Error",
+        text: "Por favor ingrese un correo electrónico válido.",
+        icon: "error",
+      });
+      return;
+    }
+  
     // Lógica para enviar los datos al API
     const method = formData.EMP_ID ? "PUT" : "POST";
     const url = formData.EMP_ID
       ? `${urlBase}${catalogueType}/${formData.EMP_ID}`
       : `${urlBase}${catalogueType}`;
-
+  
     const formDataToSend = new FormData();
     formDataToSend.append("EMP_EMAIL", formData.EMP_EMAIL);
     formDataToSend.append("EMP_HIREDATE", formData.EMP_HIREDATE);
@@ -273,19 +322,19 @@ const EmployeeForm = ({
     formDataToSend.append("EMP_ZONE", formData.EMP_ZONE);
     formDataToSend.append("EMP_CITY", formData.EMP_CITY);
     formDataToSend.append("EMP_STATE", formData.EMP_STATE);
-
+  
     if (selectedFile) {
       formDataToSend.append("EMP_IMAGEN", selectedFile);
     }
-
+  
     const response = await fetch(url, {
       method: method,
       body: formDataToSend,
     });
-
+  
     if (response.ok) {
       console.log("Registro guardado correctamente");
-
+  
       Swal.fire({
         title: "Guardado",
         text: "Registro enviado exitosamente!",
@@ -409,7 +458,7 @@ const EmployeeForm = ({
                 value={formData.EMP_NIT}
                 onChange={(e) => {
                   const { value } = e.target;
-                  if (/^[a-zA-Z0-9]{0,10}$/.test(value)) {
+                  if (/^[a-zA-Z0-9-]{0,10}$/.test(value)) {
                     handleChange(e, { name: "EMP_NIT", value });
                   }
                 }}
@@ -450,6 +499,8 @@ const EmployeeForm = ({
                 value={formData.EMP_HIREDATE}
                 onChange={handleChange}
                 width={6}
+                max={maxDateC}
+                min={minDateC}
               />
             </FormGroup>
           </Form>
@@ -501,11 +552,15 @@ const EmployeeForm = ({
             />
             <FormInput
               label="Zona"
-              type="number"
+              type="text"
               name="EMP_ZONE"
               placeholder="Zona"
               value={formData.EMP_ZONE}
-              onChange={handleChange}
+              onChange={(e, { value }) => {
+                if (/^\d{0,2}$/.test(value)) {
+                  handleChange(e, { name: "EMP_ZONE", value });
+                }
+              }}
               width={4}
             />
           </FormGroup>
@@ -544,17 +599,22 @@ const EmployeeForm = ({
       ),
     },
     {
-      menuItem: "Otros",
+      menuItem: "Imagen",
       render: () => (
         <Tab.Pane>
-          <FormField>
-            <FileInput
-              input={{
-                id: "input-file",
-              }}
-              onFileSelect={handleFileSelect}
-            />
-          </FormField>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <FormField style={{ marginRight: '125px', marginLeft: '25px' }}>
+              <img src={previewFile} alt="Preview" width={100} />
+            </FormField>
+            <FormField>
+              <FileInput
+                input={{
+                  id: "input-file",
+                }}
+                onFileSelect={handleFileSelect}
+              />
+            </FormField>
+          </div>
         </Tab.Pane>
       ),
     },
