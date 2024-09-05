@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
-import { FormField, Button, Form, Grid, TextArea } from "semantic-ui-react";
-import Swal from 'sweetalert2';
+import {
+  FormField,
+  Button,
+  Form,
+  Tab,
+  FormGroup,
+  FormInput,
+  Icon,
+} from "semantic-ui-react";
+import Swal from "sweetalert2";
+import FileInput from '../FileInput/FileInput';
 
 const ProductForm = ({
   selectedItem,
@@ -9,7 +18,36 @@ const ProductForm = ({
   catalogueType,
 }) => {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
-  
+  const urlFile = import.meta.env.VITE_DEVELOP_URL_FILE;
+  let previewFile = ''
+  const previewImg = 'uploads/img_preview.png'
+
+  // Buscar el objeto que contiene PRO_IMAGEN
+  const imagenObj = selectedItem.find(item => item.PRO_IMAGEN);
+  const imagenPath = imagenObj ? imagenObj.PRO_IMAGEN : null;
+
+  if (imagenPath) {
+    previewFile = `${urlFile}${imagenPath}`;
+  } else {
+    previewFile = `${urlFile}${previewImg}`;
+  }
+
+  console.log(selectedItem);
+  console.log(previewFile);
+
+  const handleFileSelect = (file) => {
+    setSelectedFile(file);
+  };
+  const [selectedFile, setSelectedFile] = useState(null); // Estado para el archivo seleccionado
+
+  console.log(selectedItem);
+
+  const formScrollableDiv = {
+    height: "400px",
+    overflowY: "hidden",
+    marginBottom: "20px",
+  };
+
   const [formData, setFormData] = useState({
     PRO_ID: "",
     SUP_ID: "",
@@ -18,19 +56,8 @@ const ProductForm = ({
     PRO_QUANTITY: "",
     PRO_VALUE: "",
     PRO_DESCRIPTION: "",
+    PRO_IMAGEN: "",
   });
-
-  const buttonSaveStyle = {
-    backgroundColor: "#dbac9a",
-    border: "1px solid #dbac9a",
-    color: "white",
-  };
-
-  const buttonCancelStyle = {
-    backgroundColor: "#fff",
-    color: "#9eb5b0",
-    border: "1px solid #9eb5b0",
-  };
 
   useEffect(() => {
     if (selectedItem) {
@@ -48,171 +75,238 @@ const ProductForm = ({
         PRO_QUANTITY: transformedData.PRO_QUANTITY || "",
         PRO_VALUE: transformedData.PRO_VALUE || "",
         PRO_DESCRIPTION: transformedData.PRO_DESCRIPTION || "",
+        PRO_IMAGEN: transformedData.PRO_IMAGEN || "",
       });
     }
   }, [selectedItem]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleChange = (e, { name, value }) => {
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Mapeo de nombres de campos a textos de labels
+    const fieldLabels = {
+      SUP_ID: "ID Proveedor",
+      PRO_NAME: "Nombre Producto",
+      PRO_MEASUREMENT: "Medida",
+      PRO_QUANTITY: "Cantidad",
+      PRO_VALUE: "Valor",
+      PRO_DESCRIPTION: "Descripción",
+      PRO_IMAGEN: "Imagen",
+    };
+  
+    // Validación de campos requeridos
+    const requiredFields = [
+      "SUP_ID",
+      "PRO_NAME",
+      "PRO_MEASUREMENT",
+      "PRO_QUANTITY",
+      "PRO_VALUE",
+      "PRO_DESCRIPTION",
+    ];
+  
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field]
+    );
+  
+    if (missingFields.length > 0) {
+      const missingFieldLabels = missingFields.map(
+        (field) => fieldLabels[field]
+      );
+      Swal.fire({
+        title: "Error",
+        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+        icon: "error",
+      });
+      return;
+    }
+  
+  
+    // Lógica para enviar los datos al API
     const method = formData.PRO_ID ? "PUT" : "POST";
     const url = formData.PRO_ID
       ? `${urlBase}${catalogueType}/${formData.PRO_ID}`
       : `${urlBase}${catalogueType}`;
-
+  
+    const formDataToSend = new FormData();
+    formDataToSend.append("SUP_ID", formData.SUP_ID);
+    formDataToSend.append("PRO_NAME", formData.PRO_NAME);
+    formDataToSend.append("PRO_MEASUREMENT", formData.PRO_MEASUREMENT);
+    formDataToSend.append("PRO_QUANTITY", formData.PRO_QUANTITY);
+    formDataToSend.append("PRO_VALUE", formData.PRO_VALUE);
+    formDataToSend.append("PRO_DESCRIPTION", formData.PRO_DESCRIPTION);
+  
+    if (selectedFile) {
+      formDataToSend.append("PRO_IMAGEN", selectedFile);
+    }
+  
     const response = await fetch(url, {
       method: method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        SUP_ID: formData.SUP_ID,
-        PRO_NAME: formData.PRO_NAME,
-        PRO_MEASUREMENT: formData.PRO_MEASUREMENT,
-        PRO_QUANTITY: formData.PRO_QUANTITY,
-        PRO_VALUE: formData.PRO_VALUE,
-        PRO_DESCRIPTION: formData.PRO_DESCRIPTION,
-      }),
+      body: formDataToSend,
     });
-
+  
     if (response.ok) {
       console.log("Registro guardado correctamente");
-
+  
       Swal.fire({
         title: "Guardado",
         text: "Registro enviado exitosamente!",
-        icon: "success"
+        icon: "success",
       });
       onFormSubmit();
       closeModal();
     } else {
-        Swal.fire({
-            title: "Oops...",
-            text: "Algo ha salido mal, intenta de nuevo!",
-            icon: "error"
-          });
+      Swal.fire({
+        title: "Oops...",
+        text: "Algo ha salido mal, intenta de nuevo!",
+        icon: "error",
+      });
       console.error("Error al enviar el formulario");
     }
   };
 
+  const panes = [
+    {
+      menuItem: "Datos Generales",
+      render: () => (
+        <Tab.Pane>
+          <FormGroup>
+            {formData.PRO_ID && (
+              <FormInput
+                fluid
+                label="ID"
+                type="text"
+                name="PRO_ID"
+                placeholder="ID"
+                value={formData.PRO_ID}
+                onChange={handleChange}
+                readOnly
+                width={8}
+              />
+            )}
+          </FormGroup>
+          <FormGroup widths="equal" style={{ display: "none" }}>
+            <FormInput
+              fluid
+              label="IMAGEN"
+              name="PRO_IMAGEN"
+              placeholder="Imagen"
+              value={formData.PRO_IMAGEN}
+              onChange={handleChange}
+              readOnly
+            />
+          </FormGroup>
+          <Form>
+            <FormGroup widths="equal">
+              <FormInput
+                fluid
+                label="ID Proveedor"
+                type="text"
+                name="SUP_ID"
+                placeholder="ID Proveedor"
+                value={formData.SUP_ID}
+                onChange={handleChange}
+              />
+              <FormInput
+                fluid
+                label="Nombre Producto"
+                type="text"
+                name="PRO_NAME"
+                placeholder="Nombre Producto"
+                value={formData.PRO_NAME}
+                onChange={handleChange}
+              />
+            </FormGroup>
+            <FormGroup widths="equal">
+              <FormInput
+                fluid
+                label="Medida"
+                type="text"
+                name="PRO_MEASUREMENT"
+                placeholder="Medida"
+                value={formData.PRO_MEASUREMENT}
+                onChange={handleChange}
+              />
+              <FormInput
+                fluid
+                label="Cantidad"
+                type="text"
+                name="PRO_QUANTITY"
+                placeholder="Cantidad"
+                value={formData.PRO_QUANTITY}
+                onChange={handleChange}
+              />
+            </FormGroup>
+            <FormGroup>
+              <FormInput
+                fluid
+                label="Valor (Q)"
+                type="text"
+                name="PRO_VALUE"
+                placeholder="Valor (Q)"
+                value={formData.PRO_VALUE}
+                onChange={handleChange}
+                width={6}
+              />
+              <FormInput
+                fluid
+                label="Descripción"
+                type="text"
+                name="PRO_DESCRIPTION"
+                placeholder="Descripción"
+                value={formData.PRO_DESCRIPTION}
+                onChange={handleChange}
+                width={10}
+              />
+            </FormGroup>
+          </Form>
+        </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: "Imagen",
+      render: () => (
+        <Tab.Pane>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <FormField style={{ marginRight: '125px', marginLeft: '25px' }}>
+              <img src={previewFile} alt="Preview" width={100} />
+            </FormField>
+            <FormField>
+              <FileInput
+                input={{
+                  id: "input-file",
+                }}
+                onFileSelect={handleFileSelect}
+              />
+            </FormField>
+          </div>
+        </Tab.Pane>
+      ),
+    },
+  ];
+
   return (
-    <>
-      <Form onSubmit={handleSubmit}>
-        <Grid>
-          <Grid.Row columns={3}>
-            <Grid.Column width={5}>
-              <FormField>
-                <label>ID</label>
-                <input
-                  type="number"
-                  name="PRO_ID"
-                  placeholder="ID"
-                  value={formData.PRO_ID}
-                  onChange={handleChange}
-                  readOnly
-                />
-              </FormField>
-            </Grid.Column>
-            <Grid.Column width={5}>
-              <FormField>
-                <label>Proveedor ID</label>
-                <input
-                  type="number"
-                  name="SUP_ID"
-                  placeholder="Proveedor ID"
-                  value={formData.SUP_ID}
-                  onChange={handleChange}
-                  required
-                />
-              </FormField>
-            </Grid.Column>
-            <Grid.Column width={6}>
-              <FormField>
-                <label>Nombre</label>
-                <input
-                  type="text"
-                  name="PRO_NAME"
-                  placeholder="Nombre"
-                  value={formData.PRO_NAME}
-                  onChange={handleChange}
-                  required
-                />
-              </FormField>
-            </Grid.Column>
-          </Grid.Row>
-
-          <Grid.Row columns={3}>
-            <Grid.Column width={5}>
-              <FormField>
-                <label>Medida</label>
-                <input
-                  type="number"
-                  name="PRO_MEASUREMENT"
-                  placeholder="Medida"
-                  value={formData.PRO_MEASUREMENT}
-                  onChange={handleChange}
-                  required
-                />
-              </FormField>
-            </Grid.Column>
-            <Grid.Column width={5}>
-              <FormField>
-                <label>Cantidad</label>
-                <input
-                  type="number"
-                  name="PRO_QUANTITY"
-                  placeholder="Cantidad"
-                  value={formData.PRO_QUANTITY}
-                  onChange={handleChange}
-                  required
-                />
-              </FormField>
-            </Grid.Column>
-            <Grid.Column width={6}>
-              <FormField>
-                <label>Valor</label>
-                <input
-                  type="number"
-                  name="PRO_VALUE"
-                  placeholder="Valor"
-                  value={formData.PRO_VALUE}
-                  onChange={handleChange}
-                />
-              </FormField>
-            </Grid.Column>
-          </Grid.Row>
-          <Grid.Row columns={1}>
-            <Grid.Column width={16}>
-              <FormField>
-                <label>Descripción</label>
-                <TextArea
-                  name="PRO_DESCRIPTION"
-                  placeholder="Descripción"
-                  value={formData.PRO_DESCRIPTION}
-                  onChange={handleChange}
-                  required
-                  style={{ minHeight: 100 }}
-                />
-              </FormField>
-            </Grid.Column>
-          </Grid.Row>
-        </Grid>
-
-        <div style={{ marginTop: '20px' }}>
-          <Button type="submit" style={buttonSaveStyle}>
-            Guardar
-          </Button>
-          <Button onClick={closeModal} style={buttonCancelStyle}>
-            Cerrar
-          </Button>
-        </div>
-      </Form>
-    </>
+    <Form onSubmit={handleSubmit}>
+      <div
+        style={{
+          ...formScrollableDiv,
+          overflow: "auto",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <Tab panes={panes} />
+      </div>
+      <Button type="submit" color="teal">
+        <Icon name="save" /> Guardar
+      </Button>
+      <Button onClick={closeModal} inverted color='brown'>
+        <Icon name="close" /> Cerrar
+      </Button>
+    </Form>
   );
 };
 

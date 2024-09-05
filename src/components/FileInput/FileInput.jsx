@@ -36,7 +36,7 @@ const FileInput = ({ onFileSelect }) => {
       />
 
       <button className="file-btn" onClick={onChooseFile}>
-        <Icon name="upload" /> Subir Archivo 
+        <Icon name="upload" /> Subir Imagen 
       </button>
 
       {selectedFile && (
