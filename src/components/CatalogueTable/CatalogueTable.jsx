@@ -58,6 +58,25 @@ export default function CatalogueTable({
         "EMP_IMAGEN"
       ],
     },
+    customers: { 
+      apiFields: ["CUS_FIRST_NAME", "CUS_LAST_NAME", "CUS_EMAIL", "CUS_CELLPHONE"],
+      tableHeaders: ["Nombre", "Apellido", "Email", "Telefono"],
+      formInputs: [
+        "CUS_ID",
+        "USE_ID",
+        "CUS_EMAIL",
+        "CUS_FIRST_NAME",
+        "CUS_MIDDLE_NAME",
+        "CUS_LAST_NAME",
+        "CUS_SECONDLAST_NAME",
+        "CUS_AFFILIATE",
+        "CUS_GENDER",
+        "CUS_CELLPHONE",
+        "CUS_NIT",
+        "CUS_DATE_OF_BIRTH",
+        "CUS_IMAGEN",
+      ],
+    },
     services: {
       apiFields: ["SER_SERVICENAME", "SER_VALUE"],
       tableHeaders: ["Servicio", "Valor del Servicio"],
@@ -89,6 +108,7 @@ export default function CatalogueTable({
       employees: "EMP_ID",
       services: "SER_ID",
       products: "PRO_ID",
+      customers: "CUS_ID",
       // Agrega más tipos de catálogo
     };
     return idFields[catalogueType];
