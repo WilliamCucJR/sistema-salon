@@ -15,6 +15,7 @@ import Supplier from '../Supplier';
 import Employee from '../Employee';
 import Service from '../Service';
 import Product from '../Product';
+import Customer from '../Customer';
 import userIcon from '../../assets/user-icon.png';
 import logoSistema from '../../assets/logo-sistema.png';
 import './SideMenu.css';
@@ -56,7 +57,7 @@ export default function SideMenu() {
               <Nav.Item as={Link} to="/appointments" eventKey="2" icon={<CalendarIcon />} style={{ backgroundColor: '#9eb5b0' }} >
                 Citas
               </Nav.Item>
-              <Nav.Item as={Link} to="/clients" eventKey="3" icon={<PeoplesIcon />} style={{ backgroundColor: '#9eb5b0' }} >
+              <Nav.Item as={Link} to="/customers" eventKey="3" icon={<PeoplesIcon />} style={{ backgroundColor: '#9eb5b0' }} >
                 Clientes
               </Nav.Item>
               <Nav.Item as={Link} to="/services" eventKey="4" icon={<MagicIcon />} style={{ backgroundColor: '#9eb5b0' }} >
@@ -90,6 +91,7 @@ export default function SideMenu() {
             <Route path="/employees" element={<Employee isSidebarVisible={expanded} />} />
             <Route path="/services" element={<Service isSidebarVisible={expanded} />} />
             <Route path="/products" element={<Product isSidebarVisible={expanded} />} />
+            <Route path="/customers" element={<Customer isSidebarVisible={expanded} />} />
           </Routes>
         </Content>
       </Container>
