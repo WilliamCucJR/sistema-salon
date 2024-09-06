@@ -10,7 +10,7 @@ import {
   Icon,
 } from "semantic-ui-react";
 import Swal from "sweetalert2";
-import FileInput from '../FileInput/FileInput';
+import FileInput from "../FileInput/FileInput";
 import guatemalaData from "../../data/guatemala.json";
 
 const EmployeeForm = ({
@@ -21,11 +21,11 @@ const EmployeeForm = ({
 }) => {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
   const urlFile = import.meta.env.VITE_DEVELOP_URL_FILE;
-  let previewFile = ''
-  const previewImg = 'uploads/img_preview.png'
+  let previewFile = "";
+  const previewImg = "uploads/img_preview.png";
 
   // Buscar el objeto que contiene EMP_IMAGEN
-  const imagenObj = selectedItem.find(item => item.EMP_IMAGEN);
+  const imagenObj = selectedItem.find((item) => item.EMP_IMAGEN);
   const imagenPath = imagenObj ? imagenObj.EMP_IMAGEN : null;
 
   if (imagenPath) {
@@ -33,12 +33,10 @@ const EmployeeForm = ({
   } else {
     previewFile = `${urlFile}${previewImg}`;
   }
-  
+
   console.log(selectedItem);
 
   console.log(previewFile);
-  
-  
 
   selectedItem.forEach((employee) => {
     const formatDate = (dateString) => {
@@ -67,29 +65,28 @@ const EmployeeForm = ({
     today.getDate()
   )
 
-  .toISOString()
-  .split("T")[0];
+    .toISOString()
+    .split("T")[0];
 
   const maxDateContrato = new Date(
     today.getFullYear(),
     today.getMonth(),
     today.getDate() + 30
-  )
+  );
 
   const minDateContrato = new Date(
     today.getFullYear(),
     today.getMonth(),
     today.getDate()
-  )
+  );
 
   const formatDate = (date) => {
     const d = new Date(date);
-    return d.toISOString().split('T')[0];
+    return d.toISOString().split("T")[0];
   };
 
   const maxDateC = formatDate(maxDateContrato);
   const minDateC = formatDate(minDateContrato);
-
 
   const [departamentos, setDepartamentos] = useState([]);
   const [municipios, setMunicipios] = useState([]);
@@ -227,7 +224,7 @@ const EmployeeForm = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Mapeo de nombres de campos a textos de labels
     const fieldLabels = {
       EMP_EMAIL: "Correo",
@@ -249,7 +246,7 @@ const EmployeeForm = ({
       EMP_STATE: "Departamento",
       EMP_IMAGEN: "Imagen",
     };
-  
+
     // Validación de campos requeridos
     const requiredFields = [
       "EMP_EMAIL",
@@ -270,23 +267,23 @@ const EmployeeForm = ({
       "EMP_CITY",
       "EMP_STATE",
     ];
-  
-    const missingFields = requiredFields.filter(
-      (field) => !formData[field]
-    );
-  
+
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+
     if (missingFields.length > 0) {
       const missingFieldLabels = missingFields.map(
         (field) => fieldLabels[field]
       );
       Swal.fire({
         title: "Error",
-        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(
+          ", "
+        )}`,
         icon: "error",
       });
       return;
     }
-  
+
     // Validación de formato de correo electrónico
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.EMP_EMAIL)) {
@@ -297,13 +294,13 @@ const EmployeeForm = ({
       });
       return;
     }
-  
+
     // Lógica para enviar los datos al API
     const method = formData.EMP_ID ? "PUT" : "POST";
     const url = formData.EMP_ID
       ? `${urlBase}${catalogueType}/${formData.EMP_ID}`
       : `${urlBase}${catalogueType}`;
-  
+
     const formDataToSend = new FormData();
     formDataToSend.append("EMP_EMAIL", formData.EMP_EMAIL);
     formDataToSend.append("EMP_HIREDATE", formData.EMP_HIREDATE);
@@ -322,19 +319,19 @@ const EmployeeForm = ({
     formDataToSend.append("EMP_ZONE", formData.EMP_ZONE);
     formDataToSend.append("EMP_CITY", formData.EMP_CITY);
     formDataToSend.append("EMP_STATE", formData.EMP_STATE);
-  
+
     if (selectedFile) {
       formDataToSend.append("EMP_IMAGEN", selectedFile);
     }
-  
+
     const response = await fetch(url, {
       method: method,
       body: formDataToSend,
     });
-  
+
     if (response.ok) {
       console.log("Registro guardado correctamente");
-  
+
       Swal.fire({
         title: "Guardado",
         text: "Registro enviado exitosamente!",
@@ -489,6 +486,7 @@ const EmployeeForm = ({
                 onChange={handleChange}
                 width={6}
                 max={maxDate}
+                onKeyDown={(e) => e.preventDefault()}
               />
               <FormInput
                 fluid
@@ -501,6 +499,7 @@ const EmployeeForm = ({
                 width={6}
                 max={maxDateC}
                 min={minDateC}
+                onKeyDown={(e) => e.preventDefault()}
               />
             </FormGroup>
           </Form>
@@ -571,7 +570,6 @@ const EmployeeForm = ({
               label={{
                 children: "Departamento",
                 htmlFor: "form-select-control-departamento",
-             
               }}
               placeholder="Selecciona Departamento"
               search
@@ -602,8 +600,8 @@ const EmployeeForm = ({
       menuItem: "Imagen",
       render: () => (
         <Tab.Pane>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <FormField style={{ marginRight: '125px', marginLeft: '25px' }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <FormField style={{ marginRight: "125px", marginLeft: "25px" }}>
               <img src={previewFile} alt="Preview" width={100} />
             </FormField>
             <FormField>
@@ -635,7 +633,7 @@ const EmployeeForm = ({
       <Button type="submit" color="teal">
         <Icon name="save" /> Guardar
       </Button>
-      <Button onClick={closeModal} inverted color='brown'>
+      <Button onClick={closeModal} inverted color="brown">
         <Icon name="close" /> Cerrar
       </Button>
     </Form>
