@@ -6,6 +6,7 @@ import {
   Tab,
   FormGroup,
   FormInput,
+  Select,
   Icon,
 } from "semantic-ui-react";
 import Swal from "sweetalert2";
@@ -42,6 +43,18 @@ const ProductForm = ({
 
   console.log(selectedItem);
 
+   const measurementOptions = [
+    { key: "1", text: "Unidad", value: "1" },
+    { key: "2", text: "Docena", value: "2" },
+    { key: "3", text: "Pack", value: "3" },
+  ];
+  
+   const unitOptions = [
+    { key: "1", text: "Unidad", value: "1" },
+    { key: "2", text: "Mililitros (ml)", value: "2" },
+    { key: "3", text: "Litros (L)", value: "3" },
+  ];
+
   const formScrollableDiv = {
     height: "400px",
     overflowY: "hidden",
@@ -54,6 +67,8 @@ const ProductForm = ({
     PRO_NAME: "",
     PRO_MEASUREMENT: "",
     PRO_QUANTITY: "",
+    PRO_UNIT: "",
+    PRO_STOCK: "",
     PRO_VALUE: "",
     PRO_DESCRIPTION: "",
     PRO_IMAGEN: "",
@@ -73,6 +88,8 @@ const ProductForm = ({
         PRO_NAME: transformedData.PRO_NAME || "",
         PRO_MEASUREMENT: transformedData.PRO_MEASUREMENT || "",
         PRO_QUANTITY: transformedData.PRO_QUANTITY || "",
+        PRO_UNIT: transformedData.PRO_UNIT || "",
+        PRO_STOCK: transformedData.PRO_STOCK || "",
         PRO_VALUE: transformedData.PRO_VALUE || "",
         PRO_DESCRIPTION: transformedData.PRO_DESCRIPTION || "",
         PRO_IMAGEN: transformedData.PRO_IMAGEN || "",
@@ -91,8 +108,10 @@ const ProductForm = ({
     const fieldLabels = {
       SUP_ID: "ID Proveedor",
       PRO_NAME: "Nombre Producto",
-      PRO_MEASUREMENT: "Medida",
+      PRO_MEASUREMENT: "Presentación",
       PRO_QUANTITY: "Cantidad",
+      PRO_UNIT: "Unidad Medida",
+      PRO_STOCK: "Stock",
       PRO_VALUE: "Valor",
       PRO_DESCRIPTION: "Descripción",
       PRO_IMAGEN: "Imagen",
@@ -104,6 +123,8 @@ const ProductForm = ({
       "PRO_NAME",
       "PRO_MEASUREMENT",
       "PRO_QUANTITY",
+      "PRO_UNIT",
+      "PRO_STOCK",
       "PRO_VALUE",
       "PRO_DESCRIPTION",
     ];
@@ -136,6 +157,8 @@ const ProductForm = ({
     formDataToSend.append("PRO_NAME", formData.PRO_NAME);
     formDataToSend.append("PRO_MEASUREMENT", formData.PRO_MEASUREMENT);
     formDataToSend.append("PRO_QUANTITY", formData.PRO_QUANTITY);
+    formDataToSend.append("PRO_UNIT", formData.PRO_UNIT);
+    formDataToSend.append("PRO_STOCK", formData.PRO_STOCK);
     formDataToSend.append("PRO_VALUE", formData.PRO_VALUE);
     formDataToSend.append("PRO_DESCRIPTION", formData.PRO_DESCRIPTION);
   
@@ -204,11 +227,12 @@ const ProductForm = ({
               <FormInput
                 fluid
                 label="ID Proveedor"
-                type="text"
+                type="number"
                 name="SUP_ID"
                 placeholder="ID Proveedor"
                 value={formData.SUP_ID}
                 onChange={handleChange}
+                min={1}
               />
               <FormInput
                 fluid
@@ -221,36 +245,67 @@ const ProductForm = ({
               />
             </FormGroup>
             <FormGroup widths="equal">
-              <FormInput
+            <FormField
+                control={Select}
                 fluid
-                label="Medida"
-                type="text"
+                label="Presentación"
                 name="PRO_MEASUREMENT"
-                placeholder="Medida"
+                placeholder="Selecciona presentación"
+                options={measurementOptions}
                 value={formData.PRO_MEASUREMENT}
-                onChange={handleChange}
+                onChange={(e, { value }) =>
+                  setFormData({ ...formData, PRO_MEASUREMENT: value })
+                }
               />
               <FormInput
                 fluid
-                label="Cantidad"
-                type="text"
+                label="Cantidad Producto"
+                type="number"
                 name="PRO_QUANTITY"
                 placeholder="Cantidad"
                 value={formData.PRO_QUANTITY}
                 onChange={handleChange}
+                min={1}
               />
             </FormGroup>
             <FormGroup>
+            <FormField
+                control={Select}
+                fluid
+                label="Unidad de medida"
+                name="PRO_UNIT"
+                placeholder="Selecciona Medida"
+                options={unitOptions}
+                value={formData.PRO_UNIT}
+                onChange={(e, { value }) =>
+                  setFormData({ ...formData, PRO_UNIT: value })
+                }
+                width={7}
+              />
+              <FormInput
+                fluid
+                label="Stock"
+                type="number"
+                name="PRO_STOCK"
+                placeholder="Stock"
+                value={formData.PRO_STOCK}
+                onChange={handleChange}
+                width={5}
+                min={0}
+              />
               <FormInput
                 fluid
                 label="Valor (Q)"
-                type="text"
+                type="number"
                 name="PRO_VALUE"
                 placeholder="Valor (Q)"
                 value={formData.PRO_VALUE}
                 onChange={handleChange}
-                width={6}
+                width={5}
+                min={0}
               />
+              </FormGroup>
+              <FormGroup>
               <FormInput
                 fluid
                 label="Descripción"
@@ -259,7 +314,7 @@ const ProductForm = ({
                 placeholder="Descripción"
                 value={formData.PRO_DESCRIPTION}
                 onChange={handleChange}
-                width={10}
+                width={16}
               />
             </FormGroup>
           </Form>
@@ -310,4 +365,5 @@ const ProductForm = ({
   );
 };
 
-export default ProductForm;
+export default ProductForm; 
+
