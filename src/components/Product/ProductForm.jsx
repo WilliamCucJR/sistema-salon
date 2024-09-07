@@ -53,6 +53,7 @@ const ProductForm = ({
     { key: "1", text: "Unidad", value: "Unidad" },
     { key: "2", text: "Mililitros (ml)", value: "Mililitros (ml)" },
     { key: "3", text: "Litros (L)", value: "Litros (L)" },
+    { key: "4", text: "Gramos (g)", value: "Gramos (g)" },
   ];
 
   const formScrollableDiv = {
