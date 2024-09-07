@@ -44,15 +44,15 @@ const ProductForm = ({
   console.log(selectedItem);
 
    const measurementOptions = [
-    { key: "1", text: "Unidad", value: "1" },
-    { key: "2", text: "Docena", value: "2" },
-    { key: "3", text: "Pack", value: "3" },
+    { key: "1", text: "Unidad", value: "Unidad" },
+    { key: "2", text: "Docena", value: "Docena" },
+    { key: "3", text: "Pack", value: "Pack" },
   ];
   
    const unitOptions = [
-    { key: "1", text: "Unidad", value: "1" },
-    { key: "2", text: "Mililitros (ml)", value: "2" },
-    { key: "3", text: "Litros (L)", value: "3" },
+    { key: "1", text: "Unidad", value: "Unidad" },
+    { key: "2", text: "Mililitros (ml)", value: "Mililitros (ml)" },
+    { key: "3", text: "Litros (L)", value: "Litros (L)" },
   ];
 
   const formScrollableDiv = {
