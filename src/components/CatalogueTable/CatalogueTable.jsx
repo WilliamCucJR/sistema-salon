@@ -89,7 +89,7 @@ export default function CatalogueTable({
     },  
     products: {
       apiFields: ["PRO_NAME", "PRO_QUANTITY", "PRO_UNIT", "PRO_STOCK", "PRO_VALUE", "PRO_DESCRIPTION"],
-      tableHeaders: ["Nombre", "Contenido", "Medida", "Stock", "Precio", "Descripción"],
+      tableHeaders: ["Nombre", "Contenido", "Medida", "Stock", "Precio (Q)", "Descripción"],
       formInputs: [
         "PRO_ID",
         "SUP_ID",

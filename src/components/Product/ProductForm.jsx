@@ -259,10 +259,10 @@ const ProductForm = ({
               />
               <FormInput
                 fluid
-                label="Cantidad Producto"
+                label="Contenido"
                 type="number"
                 name="PRO_QUANTITY"
-                placeholder="Cantidad"
+                placeholder="Contenido"
                 value={formData.PRO_QUANTITY}
                 onChange={handleChange}
                 min={1}
