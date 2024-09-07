@@ -174,6 +174,16 @@ const CustomerForm = ({
     });
     return;
   }
+ // Validación de formato de correo electrónico
+ const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+ if (!emailRegex.test(formData.CUS_EMAIL)) {
+   Swal.fire({
+     title: "Error",
+     text: "Por favor ingrese un correo electrónico válido.",
+     icon: "error",
+   });
+   return;
+ }
 
   // Lógica para enviar los datos al API
   const method = formData.CUS_ID ? "PUT" : "POST";
@@ -278,7 +288,7 @@ const CustomerForm = ({
                 label="Segundo Nombre"
                 type="text"
                 name="CUS_MIDDLE_NAME"
-                placeholder="Primer Apellido"
+                placeholder="Segundo Nombre"
                 value={formData.CUS_MIDDLE_NAME}
                 onChange={handleChange}
               />
@@ -364,26 +374,28 @@ const CustomerForm = ({
                 type="date"
                 name="CUS_DATE_OF_BIRTH"
                 placeholder="Nacimiento"
-                value={formData.CUS_DATE_OF_BIRTH}
+                value={formData.EMP_DATE_OF_BIRTH}
                 onChange={handleChange}
                 width={6}
-                max={maxDate}
+                max={maxDate} 
+                onKeyDown={(e) => e.preventDefault()} 
+                readOnly 
               />
               <FormInput
                 fluid
-                label="Numero de afiliacion"
+                label="Numero de afiliación "
                 type="text"
                 name="CUS_AFFILIATE"
                 placeholder="Afiliacion"
                 value={formData.CUS_AFFILIATE}
                 onChange={(e) => {
-                  const { value } = e.target;
-                  if (/^[a-zA-Z0-9]{0,10}$/.test(value)) {
-                    handleChange(e, { name: "CUS_AFFILIATE", value });
-                  }
-                }}
-                width={6}
-              />    
+                const { value } = e.target;
+                if (/^\d{0,10}$/.test(value)) {
+                handleChange(e, { name: "CUS_AFFILIATE", value });
+    }
+  }}
+  width={6}
+/>
 
             </FormGroup>
           </Form>
@@ -392,7 +404,7 @@ const CustomerForm = ({
     },
     
     {
-        menuItem: "imagen",
+        menuItem: "Imagen",
         render: () => (
           <Tab.Pane>
           <div style={{ display: 'flex', alignItems: 'center' }}>
