@@ -379,7 +379,7 @@ const CustomerForm = ({
                 width={6}
                 max={maxDate} 
                 onKeyDown={(e) => e.preventDefault()} 
-                readOnly 
+                 
               />
               <FormInput
                 fluid
