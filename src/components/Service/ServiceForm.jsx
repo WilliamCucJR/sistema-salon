@@ -198,12 +198,12 @@ const ServiceForm = ({
                 fluid
                 label="Costo del Servicio"
                 type="Number"
-                step="0.01"
                 name="SER_VALUE"
                 placeholder="Costo del Servicio"
                 value={formData.SER_VALUE}
                 onChange={handleChange}
                 width={4}
+                min = {1}
               />
             </FormGroup>
           </Form>

@@ -291,7 +291,7 @@ const ProductForm = ({
                 value={formData.PRO_STOCK}
                 onChange={handleChange}
                 width={5}
-                min={0}
+                min={3}
               />
               <FormInput
                 fluid
@@ -302,7 +302,7 @@ const ProductForm = ({
                 value={formData.PRO_VALUE}
                 onChange={handleChange}
                 width={5}
-                min={0}
+                min={1}
               />
               </FormGroup>
               <FormGroup>
