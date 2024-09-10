@@ -218,7 +218,12 @@ export default function CatalogueTable({
           placeholder="Buscar..."
           value={searchTerm}
           onChange={handleSearchChange}
-          style={{ marginBottom: "15px", width: "40%" }}
+          style={{ 
+            marginBottom: "15px", 
+            width: "40%", 
+            border: "1px solid #ccc", 
+            borderRadius: "6px"      
+          }}
         />
       </div>
       <div className="scrollable-div-table">
