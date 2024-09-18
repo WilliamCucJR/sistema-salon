@@ -11,7 +11,7 @@
     padding: 0;
 }
 
-.login-form {
+.login-form-container {
     background: rgba(255, 255, 255, 0.8);
     padding: 20px;
     border-radius: 8px;
@@ -29,18 +29,18 @@
     margin-top: 10px;
 }
 
-h2 {
+.login-title {
     text-align: center;
     margin-bottom: 20px;
 }
 
-img {
+.login-logo {
     width: 250px;
     margin: 0 auto;
     display: block;
 }
 
-span {
+.registro-button {
     color: #333;
     font-weight: bold;
     margin-top: 10px;
@@ -48,7 +48,7 @@ span {
     text-align: center;
 }
 
-form {
+.login-form {
     display: flex;
     flex-direction: column;
 }

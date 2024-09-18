@@ -20,9 +20,9 @@ export default function Login({ onLogin }) {
     <>
       <div className="login-container">
         <img src={Logo} alt="Logotipo" className="login-logo" />
-        <div className="login-form">
-          <Form onSubmit={handleSubmit}>
-            <h2>Iniciar sesión</h2>
+        <div className="login-form-container">
+          <Form onSubmit={handleSubmit} className="login-form">
+            <h2 className="login-title">Iniciar sesión</h2>
             <FormField>
               <label>Usuario</label>
               <input
@@ -43,7 +43,7 @@ export default function Login({ onLogin }) {
             <Button type="submit" className="login-button">
               Entrar
             </Button>
-            <span>
+            <span className="registro-button">
               O{" "}
               <a className="register-button" onClick={handleRegister}>
                 Registrarse
