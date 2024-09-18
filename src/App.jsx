@@ -5,6 +5,7 @@ import 'rsuite/dist/rsuite.min.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import SideMenu from './components/SideMenu/';
 import Login from './components/Login/';
+import Swal from 'sweetalert2';
 
 function App() {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
@@ -34,7 +35,12 @@ function App() {
         localStorage.setItem('token', data.token);
         setIsAuthenticated(true);
       } else {
-        alert('Credenciales inválidas');
+        Swal.fire({
+          icon: "warning",
+          text: "Nombre de usuario o contraseña incorrectos.",
+          showConfirmButton: true,
+          footer: '<a href="">¿Haz perdido tu contraseña?</a>'
+        });
       }
     } catch (error) {
       console.error('Error al iniciar sesión:', error);

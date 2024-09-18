@@ -161,13 +161,32 @@ export default function CatalogueTable({
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       Swal.fire({
-        title: "Eliminado!",
-        text: "Registro eliminado correctamente!",
-        icon: "success"
+        title: "¿Estás seguro?",
+        text: "!No podrás revertir los cambios!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Si, eliminarlo!",
+        cancelButtonText: "Cancelar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Eliminado!",
+            text: "Registro eliminado correctamente!",
+            icon: "success"
+          });
+        }
       });
       fetchData();
     } catch (error) {
+      Swal.fire({
+        title: "Oops...",
+        text: "Algo ha salido mal, intenta de nuevo!",
+        icon: "error",
+      });
       console.log("Error al eliminar el registro", error);
       setError(error);
     }

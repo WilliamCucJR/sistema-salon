@@ -16,6 +16,7 @@ import Employee from "../Employee";
 import Service from "../Service";
 import Product from "../Product";
 import Customer from "../Customer";
+import Appointment from "../Appointment";
 import userIcon from "../../assets/user-icon.png";
 import logoSistema from "../../assets/logo-sistema.png";
 import "./SideMenu.css";
@@ -79,7 +80,7 @@ export default function SideMenu() {
                 </Nav.Item>
                 <Nav.Item
                   as={Link}
-                  to="/appointments"
+                  to="/appointment"
                   eventKey="2"
                   icon={<CalendarIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
@@ -179,6 +180,10 @@ export default function SideMenu() {
             <Route
               path="/customers"
               element={<Customer isSidebarVisible={expanded} />}
+            />
+            <Route
+              path="/appointment"
+              element={<Appointment isSidebarVisible={expanded} />}
             />
           </Routes>
         </Content>
