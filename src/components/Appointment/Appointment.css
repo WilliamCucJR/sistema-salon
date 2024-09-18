@@ -15,3 +15,12 @@
     justify-content: center;
     align-items: center;
 }
+.appointment-form{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+.appointment-form-container{
+    display: flex;
+    flex-direction: column;
+}

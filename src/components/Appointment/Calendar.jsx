@@ -1,4 +1,4 @@
-import 'react-big-calendar/lib/css/react-big-calendar.css'
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
@@ -31,17 +31,19 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export default function AppointmentCalendar() {
+export default function AppointmentCalendar({ onSelectSlot }) {
   return (
-    <div style={{height: '500px' }}>
-        <Calendar
-            localizer={localizer}
-            culture="es"
-            messages={messages}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ margin: '50px' }}
-        />
+    <div style={{ height: '500px' }}>
+      <Calendar
+        localizer={localizer}
+        culture="es"
+        messages={messages}
+        startAccessor="start"
+        endAccessor="end"
+        style={{ margin: '50px' }}
+        selectable
+        onSelectSlot={onSelectSlot} // Aquí capturamos cuando se selecciona un día vacío
+      />
     </div>
-  )
+  );
 }
