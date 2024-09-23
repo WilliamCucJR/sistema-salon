@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
 import {
   GridRow,
   GridColumn,
@@ -26,6 +27,8 @@ export default function Store() {
   const [error, setError] = useState(null);
   const [userSessionData, setUserSessionData] = useState(null);
   const today = new Date();
+  const navigate = useNavigate(); // Obtener el objeto navigate
+
 
   // Fetch products
   useEffect(() => {
@@ -178,7 +181,7 @@ export default function Store() {
       sendOrderData(orderData);
       updateStock(PRO_ID, stockData);
     });
-
+    navigate('/payment');
   };
   
   const sendOrderData = async (orderData) => {
