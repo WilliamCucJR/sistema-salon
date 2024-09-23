@@ -8,7 +8,7 @@ const Home = () => {
       <h2>¿Cómo podemos ayudarte?</h2>
       <Grid columns={5} centered stackable doubling>
         <Grid.Column>
-          <Link to="/" className="menu-link">
+          <Link to="/appointment" className="menu-link">
             <div className="menu-box">
               <Icon name="calendar alternate outline" size="massive" />
               <p>Agendar</p>

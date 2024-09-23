@@ -1,71 +1,176 @@
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 import AppointmentCalendar from './Calendar';
 import Modal from '../AppointmentModal/AppointmentModal';
 import './Appointment.css';
-import { Button, Icon, FormGroup, FormInput, FormField, Select } from "semantic-ui-react";
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-
+import { Button, Icon, FormGroup, FormInput, FormField } from "semantic-ui-react";
+import TimePickerComponent from '../TimePicker/TimePicker';
+import Swal from "sweetalert2";
 
 const StatsPanel = () => {
   return (
     <div className="stats-panel">
       <div className="stat-item">
-        <h2>Q 1,200.00</h2>
+      <div className='icon-container' style={{display: 'flex', gap: '40px', alignItems: 'center' }}>
+        <h3>Q 1,200.00</h3>
+        <Icon name='chart line' size='big'/>
+      </div>
         <p>Ganancias</p>
       </div>
       <div className="stat-item">
+        <div className='icon-container' style={{display: 'flex', gap: '130px', alignItems: 'center'}}>
         <h2>12</h2>
+        <Icon name='handshake outline' size='big'/>
+        </div>
         <p>Servicios</p>
       </div>
       <div className="stat-item">
-        <h2>8</h2>
-        <p>Clientes</p>
+      <div className='icon-container' style={{display: 'flex', gap: '145px', alignItems: 'center' }}>
+       <h2>8</h2>
+        <Icon name='users' size='big'/>
+      </div>
+       <p>Clientes</p>
       </div>
     </div>
   );
 };
-const treatmentOptions = [
-  { key: "1", text: "tratamiento1", value: "tratamiento1" },
-  { key: "2", text: "tratamiento2", value: "tratamiento2" },
-];
 
-const specialistOptions = [
-  { key: "1", text: "Especialista1", value: "Especialista1" },
-  { key: "2", text: "Especialista2", value: "Especialista2" },
-];
+const AppointmentForm = ({ 
+  selectedItem,
+  date, 
+  onClose, 
+  onFormSubmit, 
+}) => {
+  const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
 
-const AppointmentForm = ({ date, onClose, onSubmit }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({
-      cliente: e.target.cliente.value,
-      telefono: e.target.telefono.value,
-      tratamiento: e.target.tratamiento.value,
-      especialista: e.target.especialista.value,
-      date,
+  const [formData, setFormData] = useState({
+      DAT_ID: "",
+      CUS_ID: "",
+      EMP_ID: "",
+      SER_ID: "",
+      DAT_START: "",  
+      DAT_END: "",  
     });
-    onClose(); // Cierra el formulario después de enviar
+  
+  useEffect(() => {
+      if (selectedItem) {
+        const transformedData = selectedItem.reduce((acc, curr) => {
+          const key = Object.keys(curr)[0];
+          acc[key] = curr[key];
+          return acc;
+      }, {});
+  
+      setFormData({
+          DAT_ID: transformedData.DAT_ID || "",
+          CUS_ID: transformedData.CUS_ID || "",
+          EMP_ID: transformedData.EMP_ID || "",
+          SER_ID: transformedData.SER_ID || "",
+          DAT_START: transformedData.DAT_START || "",
+          DAT_END: transformedData.DAT_END || "",
+        });
+      }
+  }, [selectedItem]);
+
+  const concatenateDateTime = (timeValue) => {
+    const selectedDate = new Date(date);
+    const [hours, minutes] = timeValue.split(':');
+    selectedDate.setHours(Number(hours), Number(minutes));
+    return selectedDate.toISOString();
+  };
+  
+  const handleChange = (e, { name, value }) => {
+      setFormData({ ...formData, [name]: value });
   };
 
+  const handleTimeChange = (time, field) => {
+    const dateTime = concatenateDateTime(time);
+    setFormData((prevData) => ({ ...prevData, [field]: dateTime }));
+  };
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      const fieldLabels = {
+        CUS_ID: "ID Cliente",
+        EMP_ID: "ID Empleado",
+        SER_ID: "ID Servicio",
+        DAT_START: "Hora Inicio",
+        DAT_END: "Hora Fin",
+      };
+
+      const requiredFields = [
+        "CUS_ID",
+        "EMP_ID",
+        "SER_ID",
+        "DAT_START",
+        "DAT_END",
+      ];
+
+      const missingFields = requiredFields.filter(
+        (field) => !formData[field]
+      );
+  
+      if (missingFields.length > 0) {
+        const missingFieldLabels = missingFields.map(
+          (field) => fieldLabels[field]
+        );
+        Swal.fire({
+          title: "Error",
+          text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+          icon: "error",
+        });
+        return;
+      }
+
+      const method = formData.DAT_ID ? "PUT" : "POST";
+      const url = formData.DAT_ID
+        ? `${urlBase}dates/${formData.DAT_ID}`
+        : `${urlBase}dates`;
+
+      const response = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+      });
+      
+      if (response.ok) {
+          console.log("Registro guardado correctamente");
+      
+          Swal.fire({
+            title: "Guardado",
+            text: "Registro enviado exitosamente!",
+            icon: "success",
+          });
+          onFormSubmit();
+          onClose();
+      } else {
+          Swal.fire({
+            title: "Oops...",
+            text: "Algo ha salido mal, intenta de nuevo!",
+            icon: "error",
+          });
+          console.error("Error al enviar el formulario");
+        }
+  };
 
   return (
     <div className="appointment-form-container" style={{ padding: '20px' }}>
       <h4 style={{ marginBottom: '20px' }}>Agendar Cita</h4>
       <form onSubmit={handleSubmit} className="appointment-form" style={{ display: 'flex', gap: '15px' }}>
-        
-      <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
+
+        <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
           <FormInput
             fluid
-            label="Cliente ID"
+            label='ID Cliente'
             type="text"
-            name="CLIENTE ID"
+            name="CUS_ID"
             placeholder="ID"
+            value={formData.CUS_ID}
+            onChange={handleChange}
             style={{ width: '20rem' }}
           />
           <FormInput
             fluid
-            label="Fecha"
+            label='Fecha'
             type="text"
             name="FECHA"
             placeholder="Fecha"
@@ -74,66 +179,43 @@ const AppointmentForm = ({ date, onClose, onSubmit }) => {
             readOnly
           />
         </FormGroup>
-  
+
         <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
           <FormInput
             fluid
-            label="Primer nombre"
-            type="text"
-            name="NAME"
-            placeholder="Nombre"
+            label='Tratamiento'
+            name="SER_ID"
+            placeholder="Tratamiento"
+            value={formData.SER_ID}
+            onChange={handleChange}
             style={{ width: '20rem' }}
           />
           <FormInput
-            fluid
-            label="Apellido"
-            type="text"
-            name="APELLIDO"
-            placeholder="Apellido"
-            style={{ width: '20rem' }}
-          />
-        </FormGroup>
-  
-        <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
-          <FormField
-            control={Select}
-            fluid
-            label="Tratamiento"
-            name="TRATAMIENTO"
-            placeholder="Selecciona tratamiento"
-            options={treatmentOptions}
-            style={{ width: '20rem' }}
-          />
-          <FormField
-            control={Select}
             fluid
             label="Especialista"
-            name="ESPECIALISTA"
-            placeholder="Selecciona especialista"
-            options={specialistOptions}
+            name="EMP_ID"
+            placeholder="Especialista"
+            value={formData.EMP_ID}
+            onChange={handleChange}
             style={{ width: '20rem' }}
           />
         </FormGroup>
-  
+
         <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
-          <FormInput
-            fluid
-            label="Hora inicio"
-            type="text"
-            name="HORAINICIO"
-            placeholder="Hora inicio"
-            style={{ width: '20rem' }}
-          />
-          <FormInput
-            fluid
-            label="Hora fin"
-            type="text"
-            name="HORAFIN"
-            placeholder="Hora inicio"
-            style={{ width: '20rem' }}
-          />
+          <FormField>
+            <label style={{ fontWeight: 'bold' }}>Hora Inicio</label>
+            <TimePickerComponent 
+                onChange={(value) => handleTimeChange(value, "DAT_START")} 
+            />
+          </FormField>
+          <FormField>
+            <label style={{ fontWeight: 'bold' }}>Hora Fin</label>
+            <TimePickerComponent 
+                onChange={(value) => handleTimeChange(value, "DAT_END")} 
+            />
+          </FormField>
         </FormGroup>
-  
+
         <div className='buttons-container' style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
           <Button type="submit" color="teal">
             <Icon name="save" /> Guardar
@@ -145,8 +227,6 @@ const AppointmentForm = ({ date, onClose, onSubmit }) => {
       </form>
     </div>
   );
-  
-  
 };
 
 const Appointments = () => {
@@ -155,39 +235,41 @@ const Appointments = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDayClick = (slotInfo) => {
-    console.log("Día seleccionado:", slotInfo.start); // Verifica si la fecha es capturada
+    console.log("Día seleccionado:", slotInfo.start); 
     setSelectedDate(slotInfo.start);
-    setIsModalOpen(true); // Abrimos el modal cuando se selecciona una fecha
+    setIsModalOpen(true); 
   };
 
   const handleCloseForm = () => {
-    setIsModalOpen(false); // Cerramos el modal
+    setIsModalOpen(false); 
     setSelectedDate(null);
   };
 
   const handleFormSubmit = (appointment) => {
     setAppointments([...appointments, appointment]);
     console.log('Cita guardada:', appointment);
-    handleCloseForm(); // Cerramos el modal después de guardar
+    handleCloseForm(); 
   };
 
-  return (
+  return ( 
     <div className="dashboard">
       <main className="main-content">
         <StatsPanel />
         <AppointmentCalendar onSelectSlot={handleDayClick} />
         
-        {/* Modal para el formulario de citas */}
         <Modal isOpen={isModalOpen} onClose={handleCloseForm}>
-          <AppointmentForm 
-            date={selectedDate} 
-            onClose={handleCloseForm} 
-            onSubmit={handleFormSubmit} 
-          />
+          {selectedDate && (  // Verifica que haya una fecha seleccionada antes de renderizar el formulario
+            <AppointmentForm 
+              date={selectedDate} 
+              onClose={handleCloseForm} 
+              onFormSubmit={handleFormSubmit}  // Cambia onSubmit por onFormSubmit
+            />
+          )}
         </Modal>
       </main>
     </div>
   );
-};
+  };
+  
 
 export default Appointments;
