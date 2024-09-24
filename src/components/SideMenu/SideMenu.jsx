@@ -9,6 +9,7 @@ import PeoplesMapIcon from "@rsuite/icons/PeoplesMap";
 import CalendarIcon from "@rsuite/icons/Calendar";
 import AdminIcon from "@rsuite/icons/Admin";
 import TagIcon from "@rsuite/icons/Tag";
+import GrowthIcon from '@rsuite/icons/Growth';
 import Home from "../Home/";
 import User from "../User/";
 import Supplier from "../Supplier";
@@ -16,6 +17,8 @@ import Employee from "../Employee";
 import Service from "../Service";
 import Product from "../Product";
 import Customer from "../Customer";
+import Store from "../Store";
+import Payment from "../Payment";
 import Appointment from "../Appointment";
 import userIcon from "../../assets/user-icon.png";
 import logoSistema from "../../assets/logo-sistema.png";
@@ -89,8 +92,17 @@ export default function SideMenu() {
                 </Nav.Item>
                 <Nav.Item
                   as={Link}
-                  to="/customers"
+                  to="/store"
                   eventKey="3"
+                  icon={<GrowthIcon />}
+                  style={{ backgroundColor: "#9eb5b0" }}
+                >
+                  Tienda
+                </Nav.Item>
+                <Nav.Item
+                  as={Link}
+                  to="/customers"
+                  eventKey="4"
                   icon={<PeoplesIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
@@ -99,7 +111,7 @@ export default function SideMenu() {
                 <Nav.Item
                   as={Link}
                   to="/services"
-                  eventKey="4"
+                  eventKey="5"
                   icon={<MagicIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
@@ -108,7 +120,7 @@ export default function SideMenu() {
                 <Nav.Item
                   as={Link}
                   to="/suppliers"
-                  eventKey="5"
+                  eventKey="6"
                   icon={<AdminIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
@@ -117,7 +129,7 @@ export default function SideMenu() {
                 <Nav.Item
                   as={Link}
                   to="/products"
-                  eventKey="6"
+                  eventKey="7"
                   icon={<TagIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
@@ -126,7 +138,7 @@ export default function SideMenu() {
                 <Nav.Item
                   as={Link}
                   to="/employees"
-                  eventKey="7"
+                  eventKey="8"
                   icon={<PeoplesMapIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
@@ -135,7 +147,7 @@ export default function SideMenu() {
                 <Nav.Item
                   as={Link}
                   to="/employees"
-                  eventKey="8"
+                  eventKey="9"
                   icon={<ExitIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
@@ -181,8 +193,16 @@ export default function SideMenu() {
               path="/customers"
               element={<Customer isSidebarVisible={expanded} />}
             />
-            <Route
-              path="/appointment"
+            <Route 
+              path="/store" 
+              element={<Store isSidebarVisible={expanded} />} 
+            />
+            <Route 
+              path="/payment" 
+              element={<Payment isSidebarVisible={expanded} />}
+            />
+            <Route 
+              path="/appointment" 
               element={<Appointment isSidebarVisible={expanded} />}
             />
           </Routes>

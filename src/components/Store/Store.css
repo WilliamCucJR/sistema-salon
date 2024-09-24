@@ -1,0 +1,50 @@
+.store-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 50px;
+  height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 50px;
+  padding-top: 25px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+}
+
+.button-container .ui.button {
+  width: 100%;
+}
+
+.pay-button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: right;
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.grid-card-content {
+  border-radius: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0px 0px 39px rgba(0, 0, 0, 0.04);
+}
+
+.grid-card-content:hover {
+    transform: scale(1.03);
+    transition: transform 0.2s;
+}
+
+.product-image {
+  width: 150px;
+  height: auto;
+  border-radius: 20px;
+}
