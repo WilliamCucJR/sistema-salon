@@ -1,275 +1,321 @@
 import { useState, useEffect } from 'react';
-import AppointmentCalendar from './Calendar';
+import AppointmentCalendar from '../Calendar/Calendar';
 import Modal from '../AppointmentModal/AppointmentModal';
 import './Appointment.css';
-import { Button, Icon, FormGroup, FormInput, FormField } from "semantic-ui-react";
-import TimePickerComponent from '../TimePicker/TimePicker';
+import { Button, Icon } from "semantic-ui-react";
 import Swal from "sweetalert2";
 
 const StatsPanel = () => {
   return (
-    <div className="stats-panel">
+    <div className="stats-panel" style={{ marginBottom: '10px' }}>
       <div className="stat-item">
-      <div className='icon-container' style={{display: 'flex', gap: '40px', alignItems: 'center' }}>
-        <h3>Q 1,200.00</h3>
-        <Icon name='chart line' size='big'/>
-      </div>
+        <div className='icon-container' style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
+          <h3>Q 1,200.00</h3>
+          <Icon name='chart line' size='big' />
+        </div>
         <p>Ganancias</p>
       </div>
       <div className="stat-item">
-        <div className='icon-container' style={{display: 'flex', gap: '130px', alignItems: 'center'}}>
-        <h2>12</h2>
-        <Icon name='handshake outline' size='big'/>
+        <div className='icon-container' style={{ display: 'flex', gap: '130px', alignItems: 'center' }}>
+          <h2>12</h2>
+          <Icon name='handshake outline' size='big' />
         </div>
         <p>Servicios</p>
       </div>
       <div className="stat-item">
-      <div className='icon-container' style={{display: 'flex', gap: '145px', alignItems: 'center' }}>
-       <h2>8</h2>
-        <Icon name='users' size='big'/>
-      </div>
-       <p>Clientes</p>
+        <div className='icon-container' style={{ display: 'flex', gap: '145px', alignItems: 'center' }}>
+          <h2>8</h2>
+          <Icon name='users' size='big' />
+        </div>
+        <p>Clientes</p>
       </div>
     </div>
   );
 };
 
-const AppointmentForm = ({ 
-  selectedItem,
-  date, 
-  onClose, 
-  onFormSubmit, 
-}) => {
+const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
+
+  //URL para API
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
 
+  //Inicializar data vacia
   const [formData, setFormData] = useState({
-      DAT_ID: "",
-      CUS_ID: "",
-      EMP_ID: "",
-      SER_ID: "",
-      DAT_START: "",  
-      DAT_END: "",  
-    });
-  
+    DAT_ID: "",
+    CUS_ID: "",
+    EMP_ID: "",
+    SER_ID: "",
+    DAT_START: "",
+    DAT_END: "",
+  });  
+
+  // Estado para almacenar los servicios y empleados obtenidos de la API
+  const [services, setServices] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [activeStep, setActiveStep] = useState(0);
+
+  // Identificador de pasos (Steps)
+  const steps = [
+    { title: 'Seleccionar Servicio', description: 'Selecciona el servicio deseado de las opciones disponibles.' },
+    { title: 'Seleccionar Personal', description: 'Elige a tu miembro de personal preferido para el servicio.' },
+    { title: 'Seleccionar Fecha y Hora', description: 'Elige una fecha y hora adecuadas para tu reserva.' },
+    { title: 'Detalles del Cliente', description: 'Introduce tus datos personales.' },
+    { title: 'Confirmación', description: 'Confirma tu reserva.' },
+  ];
+
+  // Controlar el paso a traves de Steps
+
+  const handleNext = () => {
+    setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
+  };
+  const handleBack = () => {
+    setActiveStep((prevStep) => Math.max(prevStep - 1, 0));
+  };
+
+  // Enviar datos a BD basado en selectedItem
   useEffect(() => {
-      if (selectedItem) {
-        const transformedData = selectedItem.reduce((acc, curr) => {
-          const key = Object.keys(curr)[0];
-          acc[key] = curr[key];
-          return acc;
+    if (selectedItem) {
+      const transformedData = selectedItem.reduce((acc, curr) => {
+        const key = Object.keys(curr)[0];
+        acc[key] = curr[key];
+        return acc;
       }, {});
-  
+
       setFormData({
-          DAT_ID: transformedData.DAT_ID || "",
-          CUS_ID: transformedData.CUS_ID || "",
-          EMP_ID: transformedData.EMP_ID || "",
-          SER_ID: transformedData.SER_ID || "",
-          DAT_START: transformedData.DAT_START || "",
-          DAT_END: transformedData.DAT_END || "",
-        });
-      }
+        DAT_ID: transformedData.DAT_ID || "",
+        CUS_ID: transformedData.CUS_ID || "",
+        EMP_ID: transformedData.EMP_ID || "",
+        SER_ID: transformedData.SER_ID || "",
+        DAT_START: transformedData.DAT_START || "",
+        DAT_END: transformedData.DAT_END || "",
+      });
+    }
   }, [selectedItem]);
 
-  const concatenateDateTime = (timeValue) => {
-    const selectedDate = new Date(date);
-    const [hours, minutes] = timeValue.split(':');
-    selectedDate.setHours(Number(hours), Number(minutes));
-    return selectedDate.toISOString();
-  };
+  // Llamadas a la API para obtener servicios según el paso activo
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch(`${urlBase}services`);
+        const servicesData = await response.json();
+        setServices(servicesData);  // Actualizar el estado con los servicios obtenidos
+      } catch (error) {
+        console.error("Error al obtener los servicios:", error);
+      }
+    };
   
-  const handleChange = (e, { name, value }) => {
-      setFormData({ ...formData, [name]: value });
-  };
+    if (activeStep === 0) {
+      fetchServices();
+    }
+  }, [activeStep, urlBase]);  // Lista de dependencias correcta
 
-  const handleTimeChange = (time, field) => {
-    const dateTime = concatenateDateTime(time);
-    setFormData((prevData) => ({ ...prevData, [field]: dateTime }));
-  };
+    // Manejador de selección de servicio
+    const handleServiceSelect = (serviceId) => {
+      setFormData((prevData) => ({
+        ...prevData,
+        SER_ID: serviceId,  // Guardar ID del servicio seleccionado
+      }));
+    };
 
-  const handleSubmit = async (e) => {
-      e.preventDefault();
-
-      const fieldLabels = {
-        CUS_ID: "ID Cliente",
-        EMP_ID: "ID Empleado",
-        SER_ID: "ID Servicio",
-        DAT_START: "Hora Inicio",
-        DAT_END: "Hora Fin",
+    useEffect(() => {
+      const fetchEmployees = async () => {
+        try {
+          const response = await fetch(`${urlBase}employees`);
+          const employeeData = await response.json();
+          setEmployees(employeeData);  // Actualizar el estado con los servicios obtenidos
+        } catch (error) {
+          console.error("Error al obtener los empleados:", error);
+        }
+      };
+    
+      if (activeStep === 1) {
+        fetchEmployees();
+      }
+    }, [activeStep, urlBase]);  // Lista de dependencias correcta
+  
+      // Manejador de selección de servicio
+      const handleEmployeeSelect = (employeeId) => {
+        setFormData((prevData) => ({
+          ...prevData,
+          EMP_ID: employeeId,  // Guardar ID del servicio seleccionado
+        }));
       };
 
-      const requiredFields = [
-        "CUS_ID",
-        "EMP_ID",
-        "SER_ID",
-        "DAT_START",
-        "DAT_END",
-      ];
+  // Manejo de subida del formulario
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      const missingFields = requiredFields.filter(
-        (field) => !formData[field]
-      );
-  
-      if (missingFields.length > 0) {
-        const missingFieldLabels = missingFields.map(
-          (field) => fieldLabels[field]
-        );
-        Swal.fire({
-          title: "Error",
-          text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
-          icon: "error",
-        });
-        return;
-      }
+    const fieldLabels = {
+      CUS_ID: "ID Cliente",
+      EMP_ID: "ID Empleado",
+      SER_ID: "ID Servicio",
+      DAT_START: "Hora Inicio",
+      DAT_END: "Hora Fin",
+    };
 
-      const method = formData.DAT_ID ? "PUT" : "POST";
-      const url = formData.DAT_ID
-        ? `${urlBase}dates/${formData.DAT_ID}`
-        : `${urlBase}dates`;
+    const requiredFields = ["CUS_ID", "EMP_ID", "SER_ID", "DAT_START", "DAT_END"];
 
-      const response = await fetch(url, {
-          method: method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+    if (missingFields.length > 0) {
+      const missingFieldLabels = missingFields.map((field) => fieldLabels[field]);
+      Swal.fire({
+        title: "Error",
+        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+        icon: "error",
       });
-      
-      if (response.ok) {
-          console.log("Registro guardado correctamente");
-      
-          Swal.fire({
-            title: "Guardado",
-            text: "Registro enviado exitosamente!",
-            icon: "success",
-          });
-          onFormSubmit();
-          onClose();
-      } else {
-          Swal.fire({
-            title: "Oops...",
-            text: "Algo ha salido mal, intenta de nuevo!",
-            icon: "error",
-          });
-          console.error("Error al enviar el formulario");
-        }
+      return;
+    }
+
+    const method = formData.DAT_ID ? "PUT" : "POST";
+    const url = formData.DAT_ID ? `${urlBase}dates/${formData.DAT_ID}` : `${urlBase}dates`;
+
+    const response = await fetch(url, {
+      method: method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    if (response.ok) {
+      console.log("Registro guardado correctamente");
+
+      Swal.fire({
+        title: "Guardado",
+        text: "Registro enviado exitosamente!",
+        icon: "success",
+      });
+      onFormSubmit();
+      onClose();
+    } else {
+      Swal.fire({
+        title: "Oops...",
+        text: "Algo ha salido mal, intenta de nuevo!",
+        icon: "error",
+      });
+      console.error("Error al enviar el formulario");
+    }
   };
 
   return (
-    <div className="appointment-form-container" style={{ padding: '20px' }}>
-      <h4 style={{ marginBottom: '20px' }}>Agendar Cita</h4>
-      <form onSubmit={handleSubmit} className="appointment-form" style={{ display: 'flex', gap: '15px' }}>
+    <div className="step-form">
+      <div className="step-sidebar">
+        <ul>
+          {steps.map((step, index) => (
+            <li
+              key={index}
+              className={index < activeStep ? 'completed' : index === activeStep ? 'active' : 'pending'}
+            >
+              <div className="step-circle">
+                {index < activeStep ? <Icon name="check circle" size="large" /> : <span>{index + 1}</span>}
+              </div>
+              <div className="step-info">
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-        <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
-          <FormInput
-            fluid
-            label='ID Cliente'
-            type="text"
-            name="CUS_ID"
-            placeholder="ID"
-            value={formData.CUS_ID}
-            onChange={handleChange}
-            style={{ width: '20rem' }}
-          />
-          <FormInput
-            fluid
-            label='Fecha'
-            type="text"
-            name="FECHA"
-            placeholder="Fecha"
-            value={date.toLocaleDateString()}
-            style={{ width: '20rem' }}
-            readOnly
-          />
-        </FormGroup>
+      <div className="step-content">
+        <h2>{steps[activeStep].title}</h2>
 
-        <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
-          <FormInput
-            fluid
-            label='Tratamiento'
-            name="SER_ID"
-            placeholder="Tratamiento"
-            value={formData.SER_ID}
-            onChange={handleChange}
-            style={{ width: '20rem' }}
-          />
-          <FormInput
-            fluid
-            label="Especialista"
-            name="EMP_ID"
-            placeholder="Especialista"
-            value={formData.EMP_ID}
-            onChange={handleChange}
-            style={{ width: '20rem' }}
-          />
-        </FormGroup>
+        {activeStep === 0 && (
+          <div className="service-cards">
+            {services.map((service) => (
+              <div 
+                key={service.SER_ID} 
+                className={`service-card ${formData.SER_ID === service.SER_ID ? 'selected' : ''}`} 
+                onClick={() => handleServiceSelect(service.SER_ID)}  // Seleccionar servicio al hacer clic
+                style={{ border: formData.SER_ID === service.SER_ID ? '2px solid teal' : '1px solid gray' }}
+              >
+                <h3>{service.SER_SERVICENAME}</h3>
+                <p>Q {service.SER_VALUE}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
-        <FormGroup widths="equal" style={{ display: 'flex', gap: '15px' }}>
-          <FormField>
-            <label style={{ fontWeight: 'bold' }}>Hora Inicio</label>
-            <TimePickerComponent 
-                onChange={(value) => handleTimeChange(value, "DAT_START")} 
-            />
-          </FormField>
-          <FormField>
-            <label style={{ fontWeight: 'bold' }}>Hora Fin</label>
-            <TimePickerComponent 
-                onChange={(value) => handleTimeChange(value, "DAT_END")} 
-            />
-          </FormField>
-        </FormGroup>
+        {activeStep === 1 && (
+          <div className="service-cards">
+           {employees.map((employee) => (
+            <div 
+              key={employee.EMP_ID} 
+              className={`service-card ${formData.EMP_ID === employee.EMP_ID ? 'selected' : ''}`} 
+              onClick={() => handleEmployeeSelect(employee.EMP_ID)}  // Seleccionar empleado al hacer clic
+              style={{ border: formData.EMP_ID === employee.EMP_ID ? '2px solid teal' : '1px solid gray' }}
+            >
+          <h3>{employee.EMP_FIRST_NAME} {employee.EMP_LAST_NAME}</h3>
+          <p>{employee.EMP_TITLE}</p>
+        </div>
+      ))}
+    </div>
+)}
 
-        <div className='buttons-container' style={{ marginTop: '40px', display: 'flex', justifyContent: 'flex-start', gap: '10px' }}>
-          <Button type="submit" color="teal">
-            <Icon name="save" /> Guardar
-          </Button>
+        <div className="step-navigation">
           <Button onClick={onClose} inverted color="brown">
             <Icon name="close" /> Cerrar
           </Button>
+          <div className="nav-buttons" style={{display: 'flex'}}>
+            <Button disabled={activeStep === 0} onClick={handleBack}>
+              <Icon name="arrow left" /> Atrás
+            </Button>
+            {activeStep === steps.length - 1 ? (
+              <Button color="teal" onClick={handleSubmit}>
+                Confirmar <Icon name="check" />
+              </Button>
+            ) : (
+              <Button color="teal" onClick={handleNext}>
+                Siguiente <Icon name="arrow right" />
+              </Button>
+            )}
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
 
+
+
+
 const Appointments = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDayClick = (slotInfo) => {
-    console.log("Día seleccionado:", slotInfo.start); 
-    setSelectedDate(slotInfo.start);
-    setIsModalOpen(true); 
+  const handleAddButtonClick = () => {
+    setIsModalOpen(true);
   };
 
   const handleCloseForm = () => {
-    setIsModalOpen(false); 
-    setSelectedDate(null);
+    setIsModalOpen(false);
   };
 
   const handleFormSubmit = (appointment) => {
     setAppointments([...appointments, appointment]);
     console.log('Cita guardada:', appointment);
-    handleCloseForm(); 
+    handleCloseForm();
   };
 
-  return ( 
+  return (
     <div className="dashboard">
       <main className="main-content">
         <StatsPanel />
-        <AppointmentCalendar onSelectSlot={handleDayClick} />
-        
+        <div style={{ marginLeft: '50px', textAlign: 'left' }}>
+          <Button color="teal" onClick={handleAddButtonClick}>
+            <Icon name="plus" /> Agregar
+          </Button>
+        </div>
+        <AppointmentCalendar />
+
+        {/* Modal opens the StepForm instead of AppointmentForm */}
         <Modal isOpen={isModalOpen} onClose={handleCloseForm}>
-          {selectedDate && (  // Verifica que haya una fecha seleccionada antes de renderizar el formulario
-            <AppointmentForm 
-              date={selectedDate} 
-              onClose={handleCloseForm} 
-              onFormSubmit={handleFormSubmit}  // Cambia onSubmit por onFormSubmit
-            />
-          )}
+          <AppointmentForm 
+            onClose={handleCloseForm} 
+            onFormSubmit={handleFormSubmit} 
+          />
         </Modal>
       </main>
     </div>
   );
-  };
-  
+};
 
 export default Appointments;
