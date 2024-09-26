@@ -16,11 +16,9 @@ const TimePickerComponent = ({ onChange }) => {
     return (
         <div>
             <DatePicker
-                disableDayPicker
                 value={dateTime}
                 onChange={handleDateTimeChange}
                 format='hh:mm A'  // Mostramos la hora en formato de 12 horas
-                placeholder='Seleccione Hora'
                 style={{ minWidth: "20rem", height: '38px' }}
                 plugins={[
                     <TimePicker 

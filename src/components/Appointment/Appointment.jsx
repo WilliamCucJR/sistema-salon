@@ -4,7 +4,7 @@ import Modal from '../AppointmentModal/AppointmentModal';
 import './Appointment.css';
 import { Button, Icon } from "semantic-ui-react";
 import Swal from "sweetalert2";
-
+import { Calendar } from 'react-multi-date-picker';
 const StatsPanel = () => {
   return (
     <div className="stats-panel" style={{ marginBottom: '10px' }}>
@@ -37,6 +37,7 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
 
   //URL para API
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
+  const urlImage = import.meta.env.VITE_DEVELOP_URL_FILE;
 
   //Inicializar data vacia
   const [formData, setFormData] = useState({
@@ -48,10 +49,26 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
     DAT_END: "",
   });  
 
-  // Estado para almacenar los servicios y empleados obtenidos de la API
+  // Estado para almacenar
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [activeStep, setActiveStep] = useState(0);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedTime, setSelectedTime] = useState("");   
+
+  //Validar fechas max de citas
+  const today = new Date();
+  const maxDateAppointment = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() + 30
+  );
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toISOString().split("T")[0];
+  };
+
+  const maxDateA = formatDate(maxDateAppointment);
 
   // Identificador de pasos (Steps)
   const steps = [
@@ -63,7 +80,6 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
   ];
 
   // Controlar el paso a traves de Steps
-
   const handleNext = () => {
     setActiveStep((prevStep) => Math.min(prevStep + 1, steps.length - 1));
   };
@@ -110,6 +126,7 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
 
     // Manejador de selección de servicio
     const handleServiceSelect = (serviceId) => {
+      console.log("Servicio seleccionado, ID:", serviceId);
       setFormData((prevData) => ({
         ...prevData,
         SER_ID: serviceId,  // Guardar ID del servicio seleccionado
@@ -134,11 +151,56 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
   
       // Manejador de selección de servicio
       const handleEmployeeSelect = (employeeId) => {
+        console.log("Empleado seleccionado, ID:", employeeId);
         setFormData((prevData) => ({
           ...prevData,
           EMP_ID: employeeId,  // Guardar ID del servicio seleccionado
         }));
       };
+
+// Manejador de selección de fecha
+const handleDateChange = (date) => {
+  setSelectedDate(date);  // Almacenar la fecha seleccionada
+};
+
+// Manejador de selección de hora
+const handleTimeSelect = (time) => {
+  setSelectedTime(time);  // Almacenar la hora seleccionada
+  console.log("Hora seleccionada:", time); 
+
+  // Verificar que la fecha haya sido seleccionada
+  if (selectedDate) {
+
+    // Crear un objeto de tipo Date con la fecha seleccionada
+    const fullDateTime = new Date(selectedDate);
+
+    // Dividir la hora en horas y minutos
+    const [hours, minutes] = time.split(':').map(Number);
+
+    // Establecer las horas y minutos en la fecha seleccionada
+    fullDateTime.setHours(hours, minutes, 0, 0);  // Establecer horas y minutos, segundos a 0
+
+    // Obtener los componentes de fecha y hora ajustados a la hora local
+    const year = fullDateTime.getFullYear();
+    const month = String(fullDateTime.getMonth() + 1).padStart(2, '0');  // Meses van de 0 a 11
+    const day = String(fullDateTime.getDate()).padStart(2, '0');
+    const formattedHours = String(fullDateTime.getHours()).padStart(2, '0');
+    const formattedMinutes = String(fullDateTime.getMinutes()).padStart(2, '0');
+    const formattedSeconds = String(fullDateTime.getSeconds()).padStart(2, '0');
+
+    // Crear el timestamp en formato "YYYY-MM-DD HH:MM:SS" para MySQL
+    const mysqlTimestamp = `${year}-${month}-${day} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+    // Actualizar el estado del formulario con la fecha y hora en formato MySQL
+    setFormData((prevData) => ({
+      ...prevData,
+      DAT_START: mysqlTimestamp,  // Formato para MySQL
+    }));
+
+    console.log("Fecha y hora seleccionada (Local): ", mysqlTimestamp);
+  }
+};
+
 
   // Manejo de subida del formulario
   const handleSubmit = async (e) => {
@@ -217,17 +279,20 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
 
       <div className="step-content">
         <h2>{steps[activeStep].title}</h2>
-
         {activeStep === 0 && (
           <div className="service-cards">
             {services.map((service) => (
               <div 
                 key={service.SER_ID} 
                 className={`service-card ${formData.SER_ID === service.SER_ID ? 'selected' : ''}`} 
-                onClick={() => handleServiceSelect(service.SER_ID)}  // Seleccionar servicio al hacer clic
+                onClick={() => handleServiceSelect(service.SER_ID)} 
                 style={{ border: formData.SER_ID === service.SER_ID ? '2px solid teal' : '1px solid gray' }}
               >
-                <h3>{service.SER_SERVICENAME}</h3>
+              <img 
+                src={`${urlImage}${service.SER_IMAGEN}`} 
+                className="service-image" 
+              />
+                <h3 className='service-title'>{service.SER_SERVICENAME}</h3>
                 <p>Q {service.SER_VALUE}</p>
               </div>
             ))}
@@ -243,11 +308,46 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
               onClick={() => handleEmployeeSelect(employee.EMP_ID)}  // Seleccionar empleado al hacer clic
               style={{ border: formData.EMP_ID === employee.EMP_ID ? '2px solid teal' : '1px solid gray' }}
             >
-          <h3>{employee.EMP_FIRST_NAME} {employee.EMP_LAST_NAME}</h3>
+          <img 
+                src={`${urlImage}${employee.EMP_IMAGEN}`} 
+                className="service-image" 
+          />
+          <h3 className='service-title'>{employee.EMP_FIRST_NAME} {employee.EMP_LAST_NAME}</h3>
           <p>{employee.EMP_TITLE}</p>
         </div>
       ))}
     </div>
+)}
+      {activeStep === 2 && (
+        <div>
+          <div className="calendar-selection">
+            <Calendar
+              selected={selectedDate}
+              onChange={handleDateChange}
+              dateFormat="dd/MM/yyyy"
+              minDate={today}
+              maxDate={maxDateA}
+            />
+            {selectedDate && (
+              <div className="time-slots">
+                {Array.from({ length: 14 }, (_, index) => {
+                  const hour = 7 + index;    
+                  const timeString = `${hour}:00`;
+                  return (
+                    <div
+                      key={timeString}
+                      className={`time-slot ${selectedTime === timeString ? 'selected' : ''}`}
+                      onClick={() => handleTimeSelect(timeString)}
+                    >
+                      {timeString} {hour < 12 ? "AM" : "PM"}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        
 )}
 
         <div className="step-navigation">
