@@ -19,10 +19,7 @@ import Product from "../Product";
 import Customer from "../Customer";
 import Store from "../Store";
 import Payment from "../Payment";
-<<<<<<< HEAD
 import Appointment from "../Appointment";
-=======
->>>>>>> 99607be224b8bf1b42aaaf1864b1e0ea741ae281
 import userIcon from "../../assets/user-icon.png";
 import logoSistema from "../../assets/logo-sistema.png";
 import "./SideMenu.css";
@@ -204,13 +201,10 @@ export default function SideMenu() {
               path="/payment" 
               element={<Payment isSidebarVisible={expanded} />}
             />
-<<<<<<< HEAD
             <Route 
               path="/appointment" 
               element={<Appointment isSidebarVisible={expanded} />}
             />
-=======
->>>>>>> 99607be224b8bf1b42aaaf1864b1e0ea741ae281
           </Routes>
         </Content>
       </Container>
