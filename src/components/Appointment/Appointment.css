@@ -51,14 +51,14 @@
 
 .step-sidebar ul {
     list-style-type: none;
-    padding: 0;
+    padding: 0px;
     margin: 0;
 }
 
 .step-sidebar li {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 35px;
 }
 
 .step-circle {
@@ -168,8 +168,8 @@
 }
 
 .service-card.selected {
-    border: 2px solid #4CAF50; /* Borde verde (o cualquier color que prefieras) */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Opcional: puedes agregar o mantener el sombreado */
+    border: 2px solid #4CAF50; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
 
 .service-card h3 {
@@ -217,6 +217,137 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 .time-slot.selected {
-    border: 2px solid #008080; /* Borde verde (o cualquier color que prefieras) */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Opcional: puedes agregar o mantener el sombreado */
+    border: 2px solid #008080; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+}
+.customer-container, .customer-details {
+    background-color: #f0f0f0; 
+    border-radius: 10px;
+    padding: 1.5em;
+    margin-bottom: 1.5em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px; 
+    margin: 10px 15px 1.5rem 0;
+}
+.customer-container:hover, .customer-details:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.customer-details{
+    margin-bottom: 50px;
+}
+.instruction {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 0.5em;
+    display: block;
+}
+
+label {
+    margin-top: 1em;
+    display: inline-block; /* Cambiar a inline-block para alinear con los inputs */
+    width: 150px; /* Ancho fijo para alinear con los inputs */
+}
+
+.dynamic-input {
+    width: calc(100% - 160px); /* Ajuste dinámico del ancho del input */
+    min-width: 150px;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    margin-top: 0.5em;
+    display: inline-block; /* Asegurar alineación con los labels */
+    vertical-align: middle; /* Alinear los inputs con los labels */
+}
+
+.gender-options {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.gender-options label {
+    position: relative;
+    cursor: pointer;
+}
+
+.radio-dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid #000;
+    display: inline-block;
+    margin-left: 0.5em;
+}
+
+input[type="radio"] {
+    display: none;
+}
+
+input[type="radio"]:checked + .radio-dot {
+    background-color: #007bff;
+}
+
+
+.customer-details label:nth-of-type(1) {
+    width: 200px; 
+}
+
+.customer-details div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.customer-details div:nth-of-type(2), 
+.customer-details div:nth-of-type(3) {
+    margin-top: 0; 
+}
+.summary-card, .summary-customer-details{
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    margin: 20px 0 30px 0;
+    width: 460px;
+    border-radius: 8px;
+}
+.summary-details, .summary-customer-details{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+}
+.services-summary{
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f0f0;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    gap: 10px;
+    padding: 10px 20px 10px 20px;
+    margin: 10px 0 0 50px;
+    width: 300px;
+}
+.service-price{
+    display: flex;
+    gap: 90px;
+}
+.service-value{
+    font-size: 16px;
+    font-weight: bold;
+}
+.tax{
+    padding-left: 100px;
+    font-size: 16px;
+}
+.total-price, .total-value{
+    font-size: 20px;
+}
+.total-card{
+    border-top: 1px solid grey;
+    padding-top: 12px;
+}
+.tot{
+    padding-left: 60px;
 }

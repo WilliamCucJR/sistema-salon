@@ -33,7 +33,7 @@ const StatsPanel = () => {
   );
 };
 
-const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
+const AppointmentForm = ({ onClose, onFormSubmit }) => {
 
   //URL para API
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
@@ -47,28 +47,18 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
     SER_ID: "",
     DAT_START: "",
     DAT_END: "",
-  });  
+  }); 
 
   // Estado para almacenar
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [activeStep, setActiveStep] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");   
-
-  //Validar fechas max de citas
-  const today = new Date();
-  const maxDateAppointment = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + 30
-  );
-  const formatDate = (date) => {
-    const d = new Date(date);
-    return d.toISOString().split("T")[0];
-  };
-
-  const maxDateA = formatDate(maxDateAppointment);
 
   // Identificador de pasos (Steps)
   const steps = [
@@ -87,27 +77,16 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
     setActiveStep((prevStep) => Math.max(prevStep - 1, 0));
   };
 
-  // Enviar datos a BD basado en selectedItem
-  useEffect(() => {
-    if (selectedItem) {
-      const transformedData = selectedItem.reduce((acc, curr) => {
-        const key = Object.keys(curr)[0];
-        acc[key] = curr[key];
-        return acc;
-      }, {});
+  // Condición para habilitar o deshabilitar el botón "Siguiente"
+  const isNextButtonDisabled = () => {
+    if (activeStep === 0 && !selectedService) return true; // Step 1: Servicio
+    if (activeStep === 1 && !selectedEmployee) return true; // Step 2: Personal
+    if (activeStep === 2 && (!selectedDate || !selectedTime)) return true; // Step 3: Fecha y Hora
+    if (activeStep === 3 && !selectedCustomer) return true; // Step 4: Cliente
+    return false;
+  };
 
-      setFormData({
-        DAT_ID: transformedData.DAT_ID || "",
-        CUS_ID: transformedData.CUS_ID || "",
-        EMP_ID: transformedData.EMP_ID || "",
-        SER_ID: transformedData.SER_ID || "",
-        DAT_START: transformedData.DAT_START || "",
-        DAT_END: transformedData.DAT_END || "",
-      });
-    }
-  }, [selectedItem]);
-
-  // Llamadas a la API para obtener servicios según el paso activo
+  // Llamadas a la API para obtener servicios
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -122,23 +101,34 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
     if (activeStep === 0) {
       fetchServices();
     }
-  }, [activeStep, urlBase]);  // Lista de dependencias correcta
+  }, [activeStep, urlBase]);  
 
-    // Manejador de selección de servicio
-    const handleServiceSelect = (serviceId) => {
-      console.log("Servicio seleccionado, ID:", serviceId);
-      setFormData((prevData) => ({
-        ...prevData,
-        SER_ID: serviceId,  // Guardar ID del servicio seleccionado
-      }));
-    };
+    // Monitorear cambios en formData
+    useEffect(() => {
+      console.log("formData actualizado:", formData);
+    }, [formData]);
 
+  // Manejador de selección de servicio
+  const handleServiceSelect = (serviceId) => {
+    console.log("ID Servicio seleccionado:", serviceId);
+
+    const service = services.find(service => service.SER_ID == serviceId);
+    setSelectedService(service);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      SER_ID: serviceId,  
+      SER_DURATION: 60, // Duración fija de 1 hora para todos los servicios
+    }));
+  };
+
+    // Llamadas a la API para obtener Empleados
     useEffect(() => {
       const fetchEmployees = async () => {
         try {
           const response = await fetch(`${urlBase}employees`);
           const employeeData = await response.json();
-          setEmployees(employeeData);  // Actualizar el estado con los servicios obtenidos
+          setEmployees(employeeData);  
         } catch (error) {
           console.error("Error al obtener los empleados:", error);
         }
@@ -147,114 +137,151 @@ const AppointmentForm = ({ selectedItem, onClose, onFormSubmit }) => {
       if (activeStep === 1) {
         fetchEmployees();
       }
-    }, [activeStep, urlBase]);  // Lista de dependencias correcta
+    }, [activeStep, urlBase]); 
   
-      // Manejador de selección de servicio
-      const handleEmployeeSelect = (employeeId) => {
-        console.log("Empleado seleccionado, ID:", employeeId);
-        setFormData((prevData) => ({
-          ...prevData,
-          EMP_ID: employeeId,  // Guardar ID del servicio seleccionado
-        }));
-      };
-
-// Manejador de selección de fecha
-const handleDateChange = (date) => {
-  setSelectedDate(date);  // Almacenar la fecha seleccionada
-};
-
-// Manejador de selección de hora
-const handleTimeSelect = (time) => {
-  setSelectedTime(time);  // Almacenar la hora seleccionada
-  console.log("Hora seleccionada:", time); 
-
-  // Verificar que la fecha haya sido seleccionada
-  if (selectedDate) {
-
-    // Crear un objeto de tipo Date con la fecha seleccionada
-    const fullDateTime = new Date(selectedDate);
-
-    // Dividir la hora en horas y minutos
-    const [hours, minutes] = time.split(':').map(Number);
-
-    // Establecer las horas y minutos en la fecha seleccionada
-    fullDateTime.setHours(hours, minutes, 0, 0);  // Establecer horas y minutos, segundos a 0
-
-    // Obtener los componentes de fecha y hora ajustados a la hora local
-    const year = fullDateTime.getFullYear();
-    const month = String(fullDateTime.getMonth() + 1).padStart(2, '0');  // Meses van de 0 a 11
-    const day = String(fullDateTime.getDate()).padStart(2, '0');
-    const formattedHours = String(fullDateTime.getHours()).padStart(2, '0');
-    const formattedMinutes = String(fullDateTime.getMinutes()).padStart(2, '0');
-    const formattedSeconds = String(fullDateTime.getSeconds()).padStart(2, '0');
-
-    // Crear el timestamp en formato "YYYY-MM-DD HH:MM:SS" para MySQL
-    const mysqlTimestamp = `${year}-${month}-${day} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-
-    // Actualizar el estado del formulario con la fecha y hora en formato MySQL
+  // Manejador de selección de empleados
+  const handleEmployeeSelect = (employeeId) => {
+    const employee = employees.find(emp => emp.EMP_ID == employeeId);
+    setSelectedEmployee(employee);
+    console.log("ID Empleado seleccionado:", employeeId);
+    
     setFormData((prevData) => ({
       ...prevData,
-      DAT_START: mysqlTimestamp,  // Formato para MySQL
+      EMP_ID: employeeId,
     }));
+  };
 
-    console.log("Fecha y hora seleccionada (Local): ", mysqlTimestamp);
-  }
-};
+  // Manejador de selección de fecha
+  const handleDateChange = (date) => {
+    setSelectedDate(date); 
+  };
+
+  //Validar fechas max de citas
+  const today = new Date();
+  const maxDateAppointment = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() + 30
+  );
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toISOString().split("T")[0];
+  };
+
+  const maxDateA = formatDate(maxDateAppointment);
 
 
-  // Manejo de subida del formulario
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Manejador de selección de hora
+  const handleTimeSelect = (time) => {
+    setSelectedTime(time); 
 
-    const fieldLabels = {
-      CUS_ID: "ID Cliente",
-      EMP_ID: "ID Empleado",
-      SER_ID: "ID Servicio",
-      DAT_START: "Hora Inicio",
-      DAT_END: "Hora Fin",
-    };
+    if (selectedDate) {
+      const fullDateTime = new Date(selectedDate);
+      const [hours, minutes] = time.split(':').map(Number);
 
-    const requiredFields = ["CUS_ID", "EMP_ID", "SER_ID", "DAT_START", "DAT_END"];
+      fullDateTime.setHours(hours, minutes, 0, 0);
 
-    const missingFields = requiredFields.filter((field) => !formData[field]);
-    if (missingFields.length > 0) {
-      const missingFieldLabels = missingFields.map((field) => fieldLabels[field]);
-      Swal.fire({
-        title: "Error",
-        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
-        icon: "error",
-      });
-      return;
+      const year = fullDateTime.getFullYear();
+      const month = String(fullDateTime.getMonth() + 1).padStart(2, '0');
+      const day = String(fullDateTime.getDate()).padStart(2, '0');
+      const formattedHours = String(fullDateTime.getHours()).padStart(2, '0');
+      const formattedMinutes = String(fullDateTime.getMinutes()).padStart(2, '0');
+      const formattedSeconds = String(fullDateTime.getSeconds()).padStart(2, '0');
+      const mysqlTimestamp = `${year}-${month}-${day} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+      const endDateTime = new Date(fullDateTime.getTime() + 60 * 60000); // 60 minutos = 1 hora
+      const endYear = endDateTime.getFullYear();
+      const endMonth = String(endDateTime.getMonth() + 1).padStart(2, '0');
+      const endDay = String(endDateTime.getDate()).padStart(2, '0');
+      const endHours = String(endDateTime.getHours()).padStart(2, '0');
+      const endMinutes = String(endDateTime.getMinutes()).padStart(2, '0');
+      const endSeconds = String(endDateTime.getSeconds()).padStart(2, '0');
+      const endMySQLTimestamp = `${endYear}-${endMonth}-${endDay} ${endHours}:${endMinutes}:${endSeconds}`;
+
+      setFormData((prevData) => ({
+        ...prevData,
+        DAT_START: mysqlTimestamp,
+        DAT_END: endMySQLTimestamp,
+      }));
+
+      console.log("Inicio Cita: ", mysqlTimestamp);
+      console.log("Fin Cita:", endMySQLTimestamp);
     }
+  };
+    // Llamadas a la API para obtener Clientes
+    useEffect(() => {
+      const fetchCustomers = async () => {
+        try {
+          const response = await fetch(`${urlBase}customers`);
+          const customerData = await response.json();
+          setCustomers(customerData);  
+        } catch (error) {
+          console.error("Error al obtener los clientes:", error);
+        }
+      };
 
-    const method = formData.DAT_ID ? "PUT" : "POST";
-    const url = formData.DAT_ID ? `${urlBase}dates/${formData.DAT_ID}` : `${urlBase}dates`;
+      if (activeStep === 3) {
+        fetchCustomers();
+      }
+    }, [activeStep, urlBase]); 
 
-    const response = await fetch(url, {
+// Manejador de selección de cliente
+const handleCustomerSelect = (event) => {
+  const customerId = event.target.value;
+  console.log("ID Cliente seleccionado:", customerId);
+  setSelectedCustomer(customerId);
+
+  const customer = customers.find(cust => cust.CUS_ID == customerId);
+  setSelectedCustomer(customer);
+
+  setFormData((prevData) => ({
+    ...prevData,
+    CUS_ID: customerId,
+    CUS_CELLPHONE: customer ? customer.CUS_CELLPHONE : "",
+    CUS_EMAIL: customer ? customer.CUS_EMAIL : "",
+    CUS_NIT: customer ? customer.CUS_NIT : "",
+    CUS_GENDER: customer ? customer.CUS_GENDER : "",
+  }));
+};
+   
+// Manejo de subida del formulario
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Omitir SER_DURATION de la desestructuración
+  const { SER_DURATION, CUS_CELLPHONE, CUS_EMAIL, CUS_GENDER, CUS_NIT, ...dataToSubmit } = formData;
+
+  console.log("Duracion a omitir", SER_DURATION, CUS_CELLPHONE, CUS_EMAIL, CUS_GENDER, CUS_NIT)
+  console.log("Datos a enviar:", dataToSubmit);
+
+  const method = dataToSubmit.DAT_ID ? "PUT" : "POST";
+  const url = dataToSubmit.DAT_ID ? `${urlBase}dates/${dataToSubmit.DAT_ID}` : `${urlBase}dates`;
+
+  const response = await fetch(url, {
       method: method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
+      body: JSON.stringify(dataToSubmit),
+  });
 
-    if (response.ok) {
+  if (response.ok) {
       console.log("Registro guardado correctamente");
 
       Swal.fire({
-        title: "Guardado",
-        text: "Registro enviado exitosamente!",
-        icon: "success",
+          title: "Guardado",
+          text: "Registro enviado exitosamente!",
+          icon: "success",
       });
       onFormSubmit();
       onClose();
-    } else {
+  } else {
       Swal.fire({
-        title: "Oops...",
-        text: "Algo ha salido mal, intenta de nuevo!",
-        icon: "error",
+          title: "Oops...",
+          text: "Algo ha salido mal, intenta de nuevo!",
+          icon: "error",
       });
       console.error("Error al enviar el formulario");
-    }
-  };
+  }
+};
 
   return (
     <div className="step-form">
@@ -347,8 +374,149 @@ const handleTimeSelect = (time) => {
             )}
           </div>
         </div>
-        
+ 
 )}
+{activeStep === 3 && (
+  <div>
+    <div className='customer-container'>
+      <label className='instruction'>1. Seleccionar Cliente</label>
+        <div>
+          <label>Cliente</label>
+          <select
+            id="customer-select"
+            value={formData.CUS_ID}
+            onChange={handleCustomerSelect}
+            className="dynamic-input"
+            style={{cursor: 'pointer'}}
+          >
+            <option value="">Seleccione cliente</option>
+            {customers.map((customer) => (
+              <option key={customer.CUS_ID} value={customer.CUS_ID}>
+                {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
+              </option>
+            ))}
+          </select>
+        </div>
+          
+    </div>
+      {formData.CUS_ID && (
+            <div className="customer-details">
+            <label className='instruction'>2. Verificar datos</label>
+            <div>
+                <label>Email:</label>
+                <input
+                  type="email"
+                  value={formData.CUS_EMAIL}
+                  readOnly
+                  className="dynamic-input"
+                />
+              </div>
+              <div>
+                  <label>Teléfono:</label>
+                  <input
+                    type="text"
+                    value={formData.CUS_CELLPHONE}
+                    readOnly
+                    className="dynamic-input"
+                  />
+              </div>
+              <div>
+                  <label>NIT:</label>
+                  <input
+                    type="text"
+                    value={formData.CUS_NIT}
+                    readOnly
+                    className="dynamic-input"
+                  />
+              </div>
+              <div>
+                  <label>Género:</label>
+                  <div className="gender-options">
+                    <label>
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="masculino"
+                        checked={formData.CUS_GENDER === 'masculino'}
+                        onChange={() => setFormData((prevData) => ({
+                          ...prevData,
+                          CUS_GENDER: 'masculino',
+                        }))}
+                      />
+                      Masculino
+                      <span className="radio-dot"></span>
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="femenino"
+                        checked={formData.CUS_GENDER === 'femenino'}
+                        onChange={() => setFormData((prevData) => ({
+                          ...prevData,
+                          CUS_GENDER: 'femenino',
+                        }))}
+                      />
+                      Femenino
+                      <span className="radio-dot"></span>
+                    </label>
+                    
+  </div>
+</div>
+
+            </div>
+          )}
+    </div>
+)}
+{activeStep === 4 && (
+  <div className="appointment-summary">
+  {/* Resumen Cita */}
+  <div className="summary-card">
+    <h4>Resumen cita</h4>
+    <div className="summary-details">
+      <div className="summary-item">
+        <strong>Especialista: </strong> {selectedEmployee.EMP_FIRST_NAME} {selectedEmployee.EMP_LAST_NAME}
+      </div>
+      <div className="summary-item">
+        <strong>Fecha de inicio: </strong> {formData.DAT_START}
+      </div>
+      <div className="summary-item">
+        <strong>Fecha de fin: </strong> {formData.DAT_END}
+      </div>
+      <div className='services-summary'>
+      <strong>Servicios </strong>
+      <div className='service-price'>
+        {selectedService.SER_SERVICENAME} <span className='service-value'> Q{selectedService.SER_VALUE}</span> 
+      </div>
+      <strong>Impuestoss </strong>
+      <div className='service-price'>
+      IVA<span className='service-value tax'> Q 0.00</span> 
+      </div>
+      <div className='service-price total-card'>
+      <strong className='total-price'>Total </strong><span className='service-value total-value tot'> Q{selectedService.SER_VALUE}</span>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Detalles del Cliente */}
+  <div className="customer-card">
+    <div className="summary-customer-details">
+    <h4>Detalles del Cliente</h4>
+      <div className="customer-item">
+        <strong>Nombre: </strong> {selectedCustomer.CUS_FIRST_NAME} {selectedCustomer.CUS_LAST_NAME}
+      </div>
+      <div className="customer-item">
+        <strong>Correo Electrónico: </strong> {formData.CUS_EMAIL}
+      </div>
+      <div className="customer-item">
+        <strong>Teléfono: </strong> {formData.CUS_CELLPHONE}
+      </div>
+    </div>
+  </div>
+</div>
+)}
+
 
         <div className="step-navigation">
           <Button onClick={onClose} inverted color="brown">
@@ -363,7 +531,7 @@ const handleTimeSelect = (time) => {
                 Confirmar <Icon name="check" />
               </Button>
             ) : (
-              <Button color="teal" onClick={handleNext}>
+              <Button color="teal" onClick={handleNext} disabled={isNextButtonDisabled()}>
                 Siguiente <Icon name="arrow right" />
               </Button>
             )}
@@ -391,7 +559,6 @@ const Appointments = () => {
 
   const handleFormSubmit = (appointment) => {
     setAppointments([...appointments, appointment]);
-    console.log('Cita guardada:', appointment);
     handleCloseForm();
   };
 
