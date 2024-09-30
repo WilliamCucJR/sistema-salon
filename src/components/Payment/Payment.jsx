@@ -13,6 +13,9 @@ import {
   Button,
 } from "semantic-ui-react";
 import { jwtDecode } from "jwt-decode";
+import Swal from "sweetalert2";
+import jsPDF from "jspdf";
+import { useNavigate } from "react-router-dom";
 import "./Payment.css";
 import paymentMethods from "../../assets/payment_methods.png";
 
@@ -23,6 +26,86 @@ export default function Payment() {
   const [userSessionData, setUserSessionData] = useState(null);
   const [cartProducts, setCartProducts] = useState(null);
   const [totalPayment, setTotalPayment] = useState(0);
+  const navigate = useNavigate(); // Obtener el objeto navigate
+
+  const [formData, setFormData] = useState({
+    paymentMethod: "efectivo",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    nit: "",
+    cardNumber: "",
+    expiryDate: "",
+    securityCode: "",
+    acceptTerms: false,
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text("Factura", 105, 20, null, null, "center");
+
+    doc.setFontSize(12);
+    doc.text(`Nombre: ${formData.firstName} ${formData.lastName}`, 10, 40);
+    doc.text(`Correo: ${formData.email}`, 10, 50);
+    doc.text(`Teléfono: ${formData.phone}`, 10, 60);
+    doc.text(`NIT: ${formData.nit}`, 10, 70);
+    doc.text(`Método de Pago: ${formData.paymentMethod}`, 10, 80);
+
+    doc.line(10, 90, 200, 90);
+
+    doc.setFontSize(14);
+    doc.text("Productos", 10, 100);
+
+    doc.setFontSize(12);
+    let y = 110;
+    doc.text("No.", 10, y);
+    doc.text("Producto", 30, y);
+    doc.text("Precio", 150, y);
+    doc.text("Cantidad", 170, y);
+    doc.text("Total", 190, y);
+
+    y += 10;
+    cartProducts.forEach((product, index) => {
+      doc.text(`${index + 1}`, 10, y);
+      doc.text(product.PRO_NAME, 30, y);
+      doc.text(`Q${product.ORD_TOTAL}`, 150, y);
+      doc.text(`${product.ORD_QUANTITY}`, 170, y);
+      doc.text(
+        `Q${(product.ORD_TOTAL * product.ORD_QUANTITY).toFixed(2)}`,
+        190,
+        y
+      );
+      y += 10;
+    });
+
+    doc.line(10, y, 200, y);
+    y += 10;
+
+    doc.setFontSize(14);
+    doc.text(`Total: Q${totalPayment.toFixed(2)}`, 10, y);
+
+    const now = new Date();
+    const dateTimeString = `${now.getFullYear()}${String(
+      now.getMonth() + 1
+    ).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}${String(
+      now.getHours()
+    ).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}${String(
+      now.getSeconds()
+    ).padStart(2, "0")}${String(now.getMilliseconds()).padStart(3, "0")}`;
+
+    doc.save(`factura_${dateTimeString}.pdf`);
+  };
 
   const fetchCartProducts = useCallback(
     async (userId) => {
@@ -46,6 +129,7 @@ export default function Payment() {
     },
     [urlCart]
   );
+
   useEffect(() => {
     const decodeToken = () => {
       const token = localStorage.getItem("token");
@@ -73,6 +157,109 @@ export default function Payment() {
     }
   }, [userSessionData, fetchCartProducts]);
 
+  const handlePayment = async (event) => {
+    event.preventDefault();
+    console.log("Datos del formulario:", formData);
+    console.log("Productos a pagar:", cartProducts);
+
+    for (const product of cartProducts) {
+      try {
+        const response = await fetch(`${urlCart}/${product.ORD_ID}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ORD_STATUS: 1 }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error al realizar el pago ${product.ORD_ID}`);
+        }
+
+        const updatedProduct = await response.json();
+        console.log(`Producto actualizado: ${updatedProduct}`);
+        Swal.fire({
+          title: "Pagado",
+          text: "Pago realizado exitosamente!",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Descargar Factura",
+          cancelButtonText: "Cerrar",
+          preConfirm: () => {
+            generatePDF();
+            Swal.update({
+              title: "Pagado",
+              text: "Pago realizado exitosamente! Puedes cerrar esta alerta.",
+              icon: "success",
+              showCancelButton: true,
+              confirmButtonText: "Descargar Factura",
+              cancelButtonText: "Cerrar",
+            });
+            return false;
+          },
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.cancel) {
+            navigate("/store");
+          }
+        });
+      } catch (error) {
+        console.error(
+          `Error al actualizar el producto ${product.ORD_ID}:`,
+          error
+        );
+      }
+    }
+  };
+
+  const handleExpiryDateChange = (e) => {
+    let { value } = e.target;
+    value = value.replace(/\D/g, "");
+
+    if (value.length > 2) {
+      value = `${value.slice(0, 2)}/${value.slice(2, 4)}`;
+    }
+
+    if (value.length > 5) {
+      value = value.slice(0, 5);
+    }
+
+    setFormData({
+      ...formData,
+      expiryDate: value,
+    });
+  };
+
+  const handleSecurityCodeChange = (e) => {
+    let { value } = e.target;
+    value = value.replace(/\D/g, "");
+
+    if (value.length > 3) {
+      value = value.slice(0, 3);
+    }
+
+    setFormData({
+      ...formData,
+      securityCode: value,
+    });
+  };
+
+  const handleCardNumberChange = (e) => {
+    let { value } = e.target;
+    value = value.replace(/\D/g, "");
+
+    if (value.length > 16) {
+      value = value.slice(0, 16);
+    }
+
+    // Agregar un espacio cada 4 caracteres
+    value = value.replace(/(.{4})/g, "$1 ").trim();
+
+    setFormData({
+      ...formData,
+      cardNumber: value,
+    });
+  };
+
   return (
     <div>
       <h1>Formulario de pago</h1>
@@ -92,8 +279,10 @@ export default function Payment() {
                     }
                     control="input"
                     type="radio"
-                    name="paymentMethonOptions"
-                    defaultChecked
+                    name="paymentMethod"
+                    value="efectivo"
+                    checked={formData.paymentMethod === "efectivo"}
+                    onChange={handleInputChange}
                   />
                   <FormField
                     label={
@@ -104,7 +293,10 @@ export default function Payment() {
                     }
                     control="input"
                     type="radio"
-                    name="paymentMethonOptions"
+                    name="paymentMethod"
+                    value="tarjeta"
+                    checked={formData.paymentMethod === "tarjeta"}
+                    onChange={handleInputChange}
                   />
                 </FormGroup>
                 <FormGroup widths="equal">
@@ -113,61 +305,96 @@ export default function Payment() {
                     control={Input}
                     label="Nombres"
                     placeholder="Nombres"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
                   />
                   <FormField
                     id="form-input-control-last-name"
                     control={Input}
                     label="Apellidos"
                     placeholder="Apellidos"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
                   />
                 </FormGroup>
                 <FormGroup widths="equal">
                   <FormField
-                    id="form-input-control-first-name"
+                    id="form-input-control-email"
                     control={Input}
                     label="Correo electrónico"
                     placeholder="Correo electrónico"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                   />
                   <FormField
-                    id="form-input-control-last-name"
+                    id="form-input-control-phone"
                     control={Input}
-                    label="Telefono"
-                    placeholder="Telefono"
+                    label="Teléfono"
+                    placeholder="Teléfono"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
                   />
                   <FormField
-                    id="form-input-control-last-name"
+                    id="form-input-control-nit"
                     control={Input}
                     label="NIT"
                     placeholder="NIT"
+                    name="nit"
+                    value={formData.nit}
+                    onChange={handleInputChange}
                   />
                 </FormGroup>
                 <FormGroup widths="equal">
                   <FormField
-                    id="form-input-control-first-name"
+                    id="form-input-control-card-number"
                     control={Input}
                     label="Número de tarjeta"
-                    placeholder="Numero de tarjeta"
+                    placeholder="Número de tarjeta"
+                    name="cardNumber"
+                    value={formData.cardNumber}
+                    onChange={handleCardNumberChange}
+                    disabled={formData.paymentMethod === "efectivo"}
                   />
                 </FormGroup>
                 <FormGroup widths="equal">
                   <FormField
-                    id="form-input-control-first-name"
+                    id="form-input-control-expiry-date"
                     control={Input}
                     label="Fecha de vencimiento (MM/YY)"
-                    placeholder="Fecha de vencimiento (MM/YY)"
+                    placeholder="MM/YY"
+                    name="expiryDate"
+                    value={formData.expiryDate}
+                    onChange={handleExpiryDateChange}
+                    disabled={formData.paymentMethod === "efectivo"}
                   />
                   <FormField
-                    id="form-input-control-last-name"
+                    id="form-input-control-security-code"
                     control={Input}
                     label="Código de seguridad"
                     placeholder="Código de seguridad"
+                    name="securityCode"
+                    value={formData.securityCode}
+                    onChange={handleSecurityCodeChange}
+                    disabled={formData.paymentMethod === "efectivo"}
                   />
                 </FormGroup>
                 <FormField
                   control={Checkbox}
                   label={{ children: "Acepto los términos y condiciones" }}
+                  name="acceptTerms"
+                  checked={formData.acceptTerms}
+                  onChange={handleInputChange}
                 />
-                <Button type="submit" color="teal" className="pay-button">
+                <Button
+                  type="submit"
+                  color="teal"
+                  className="pay-button"
+                  onClick={handlePayment}
+                >
                   Pagar
                 </Button>
               </Form>
@@ -187,9 +414,22 @@ export default function Payment() {
                         </GridColumn>
                         <GridColumn width={12}>
                           <h3>{product.PRO_NAME}</h3>
-                          <span>{product.PRO_DESCRIPTION}</span><br/>
-                          <span>Precio: <b>Q{product.ORD_TOTAL}</b></span><br/>
-                          <span>Cantidad: <b>{product.ORD_QUANTITY}</b></span><br/>
+                          <span>{product.PRO_DESCRIPTION}</span>
+                          <br />
+                          <span>
+                            Precio:{" "}
+                            <b>
+                              Q
+                              {(
+                                product.ORD_TOTAL / product.ORD_QUANTITY
+                              ).toFixed(2)}
+                            </b>
+                          </span>
+                          <br />
+                          <span>
+                            Cantidad: <b>{product.ORD_QUANTITY}</b>
+                          </span>
+                          <br />
                         </GridColumn>
                       </GridRow>
                     ))}
@@ -202,10 +442,14 @@ export default function Payment() {
                 <Grid>
                   <GridRow>
                     <GridColumn width={8}>
-                        <span className="total-text"><b>Total a pagar:</b></span>
+                      <span className="total-pay total-text ">
+                        Total a pagar:
+                      </span>
                     </GridColumn>
                     <GridColumn width={8}>
-                        <span className="total-number-text"><b>Q{totalPayment.toFixed(2)}</b></span>
+                      <span className="total-number-text">
+                        <b>Q{totalPayment.toFixed(2)}</b>
+                      </span>
                     </GridColumn>
                   </GridRow>
                 </Grid>

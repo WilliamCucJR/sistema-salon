@@ -1,39 +1,39 @@
-.pay-button{
-    width: 100%;
+.pay-button {
+  width: 100%;
 }
 
-.cards-image{
-    width: 400px;
-    height: auto;
-    margin: 0 auto;
+.cards-image {
+  width: 400px;
+  height: auto;
+  margin: 0 auto;
 }
 
-.cart-products-list{
-    height: 600px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 20px;
+.cart-products-list {
+  height: 570px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
 }
 
-.gird-row{
-    background-color: #e6e6e6;
-    margin: 10px;
-    border-radius: 20px;
+.gird-row {
+  background-color: #e6e6e6;
+  margin: 10px;
+  border-radius: 20px;
 }
 
-.grid-image{
-    border-radius: 20px;
+.grid-image {
+  border-radius: 20px;
 }
 
-.total-pay-content{
-    padding: 20px;
+.total-pay-content {
+  padding: 20px;
 }
 
-.total-text{
-    font-size: 40px;
+.total-text {
+  font-size: 40px;
 }
 
-.total-number-text{
-    font-size: 40px;
-    float: right;
+.total-number-text {
+  font-size: 40px;
+  float: right;
 }
