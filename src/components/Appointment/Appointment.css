@@ -243,7 +243,7 @@
     display: block;
 }
 
-label {
+.customer-details-label {
     margin-top: 1em;
     display: inline-block; /* Cambiar a inline-block para alinear con los inputs */
     width: 150px; /* Ancho fijo para alinear con los inputs */
@@ -272,22 +272,7 @@ label {
     cursor: pointer;
 }
 
-.radio-dot {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    border: 2px solid #000;
-    display: inline-block;
-    margin-left: 0.5em;
-}
 
-input[type="radio"] {
-    display: none;
-}
-
-input[type="radio"]:checked + .radio-dot {
-    background-color: #007bff;
-}
 
 
 .customer-details label:nth-of-type(1) {

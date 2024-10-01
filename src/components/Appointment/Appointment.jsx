@@ -39,7 +39,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
   const urlImage = import.meta.env.VITE_DEVELOP_URL_FILE;
 
-  //Inicializar data vacia
+  //Inicializar data para Appointments
   const [formData, setFormData] = useState({
     DAT_ID: "",
     CUS_ID: "",
@@ -49,6 +49,18 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     DAT_END: "",
   }); 
 
+  const [orderData, setOrderData] = useState({
+    ORD_ID: "",
+    ORD_IDENTIFIER: "",
+    ORD_ORDER_DATE: "",
+    CUS_ID: 1,
+    PRO_ID: null,
+    SER_ID: "",
+    ORD_QUANTITY: 1,
+    ORD_TOTAL: "",
+    ORD_STATUS: 1,
+  }); 
+ 
   // Estado para almacenar
   const [services, setServices] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -92,7 +104,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
       try {
         const response = await fetch(`${urlBase}services`);
         const servicesData = await response.json();
-        setServices(servicesData);  // Actualizar el estado con los servicios obtenidos
+        setServices(servicesData); 
       } catch (error) {
         console.error("Error al obtener los servicios:", error);
       }
@@ -103,10 +115,9 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     }
   }, [activeStep, urlBase]);  
 
-    // Monitorear cambios en formData
     useEffect(() => {
-      console.log("formData actualizado:", formData);
-    }, [formData]);
+      console.log("OrderData actualizado:", orderData);
+    }, [orderData]);
 
   // Manejador de selección de servicio
   const handleServiceSelect = (serviceId) => {
@@ -120,6 +131,17 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
       SER_ID: serviceId,  
       SER_DURATION: 60, // Duración fija de 1 hora para todos los servicios
     }));
+
+    setOrderData((prevData) => ({
+      ...prevData,
+      SER_ID: serviceId,  
+    }));
+
+    setOrderData((prevData) => ({
+      ...prevData,
+      ORD_TOTAL: selectedService?.SER_VALUE || 0,
+    }));
+  
   };
 
     // Llamadas a la API para obtener Empleados
@@ -198,10 +220,19 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
       const endSeconds = String(endDateTime.getSeconds()).padStart(2, '0');
       const endMySQLTimestamp = `${endYear}-${endMonth}-${endDay} ${endHours}:${endMinutes}:${endSeconds}`;
 
+      const orderIdentifier = `ORD1${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}`;
+      const orderDate = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()} ${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+     
       setFormData((prevData) => ({
         ...prevData,
         DAT_START: mysqlTimestamp,
         DAT_END: endMySQLTimestamp,
+      }));
+
+      setOrderData((prevData) => ({
+        ...prevData,
+        ORD_IDENTIFIER: orderIdentifier,
+        ORD_ORDER_DATE: orderDate,
       }));
 
       console.log("Inicio Cita: ", mysqlTimestamp);
@@ -243,25 +274,30 @@ const handleCustomerSelect = (event) => {
     CUS_GENDER: customer ? customer.CUS_GENDER : "",
   }));
 };
-   
+
 // Manejo de subida del formulario
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   // Omitir SER_DURATION de la desestructuración
   const { SER_DURATION, CUS_CELLPHONE, CUS_EMAIL, CUS_GENDER, CUS_NIT, ...dataToSubmit } = formData;
-
   console.log("Duracion a omitir", SER_DURATION, CUS_CELLPHONE, CUS_EMAIL, CUS_GENDER, CUS_NIT)
   console.log("Datos a enviar:", dataToSubmit);
 
   const method = dataToSubmit.DAT_ID ? "PUT" : "POST";
-  const url = dataToSubmit.DAT_ID ? `${urlBase}dates/${dataToSubmit.DAT_ID}` : `${urlBase}dates`;
+  const urlAppointment = dataToSubmit.DAT_ID ? `${urlBase}dates/${dataToSubmit.DAT_ID}` : `${urlBase}dates`;
+  const urlOrder = orderData.ORD_ID ? `${urlBase}cart/${orderData.ORD_ID}` : `${urlBase}cart`;
 
-  const response = await fetch(url, {
+  const response = await fetch(urlAppointment, {
       method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dataToSubmit),
   });
+  const OrderResponse = await fetch(urlOrder, {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(orderData),
+});
 
   if (response.ok) {
       console.log("Registro guardado correctamente");
@@ -281,6 +317,14 @@ const handleSubmit = async (e) => {
       });
       console.error("Error al enviar el formulario");
   }
+
+  if (OrderResponse.ok) {
+    console.log("Orden guardada correctamente");
+    onFormSubmit();
+    onClose();
+} else {
+    console.error("Error al crear orden");
+}
 };
 
   return (
@@ -379,95 +423,95 @@ const handleSubmit = async (e) => {
 {activeStep === 3 && (
   <div>
     <div className='customer-container'>
-      <label className='instruction'>1. Seleccionar Cliente</label>
+      <label className='instruction customer-details-label'>1. Seleccionar Cliente</label>
+      <div>
+        <label className='customer-details-label select' style={{width: '160px'}}>Cliente</label>
+        <select
+          id="customer-select"
+          value={formData.CUS_ID}
+          onChange={handleCustomerSelect}
+          className="dynamic-input"
+          style={{cursor: 'pointer'}}
+        >
+          <option value="">Seleccione cliente</option>
+          {customers.map((customer) => (
+            <option key={customer.CUS_ID} value={customer.CUS_ID}>
+              {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+    {formData.CUS_ID && (
+      <div className="customer-details">
+        <label className='instruction customer-details-label'>2. Verificar datos</label>
         <div>
-          <label>Cliente</label>
-          <select
-            id="customer-select"
-            value={formData.CUS_ID}
-            onChange={handleCustomerSelect}
+          <label className='customer-details-label'>Email:</label>
+          <input
+            type="email"
+            value={formData.CUS_EMAIL}
+            readOnly
             className="dynamic-input"
-            style={{cursor: 'pointer'}}
-          >
-            <option value="">Seleccione cliente</option>
-            {customers.map((customer) => (
-              <option key={customer.CUS_ID} value={customer.CUS_ID}>
-                {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
-              </option>
-            ))}
-          </select>
+          />
         </div>
-          
-    </div>
-      {formData.CUS_ID && (
-            <div className="customer-details">
-            <label className='instruction'>2. Verificar datos</label>
-            <div>
-                <label>Email:</label>
-                <input
-                  type="email"
-                  value={formData.CUS_EMAIL}
-                  readOnly
-                  className="dynamic-input"
-                />
-              </div>
-              <div>
-                  <label>Teléfono:</label>
-                  <input
-                    type="text"
-                    value={formData.CUS_CELLPHONE}
-                    readOnly
-                    className="dynamic-input"
-                  />
-              </div>
-              <div>
-                  <label>NIT:</label>
-                  <input
-                    type="text"
-                    value={formData.CUS_NIT}
-                    readOnly
-                    className="dynamic-input"
-                  />
-              </div>
-              <div>
-                  <label>Género:</label>
-                  <div className="gender-options">
-                    <label>
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="masculino"
-                        checked={formData.CUS_GENDER === 'masculino'}
-                        onChange={() => setFormData((prevData) => ({
-                          ...prevData,
-                          CUS_GENDER: 'masculino',
-                        }))}
-                      />
-                      Masculino
-                      <span className="radio-dot"></span>
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="femenino"
-                        checked={formData.CUS_GENDER === 'femenino'}
-                        onChange={() => setFormData((prevData) => ({
-                          ...prevData,
-                          CUS_GENDER: 'femenino',
-                        }))}
-                      />
-                      Femenino
-                      <span className="radio-dot"></span>
-                    </label>
-                    
+        <div>
+          <label className='customer-details-label'>Teléfono:</label>
+          <input
+            type="text"
+            value={formData.CUS_CELLPHONE}
+            readOnly
+            className="dynamic-input"
+          />
+        </div>
+        <div>
+          <label className='customer-details-label'>NIT:</label>
+          <input
+            type="text"
+            value={formData.CUS_NIT}
+            readOnly
+            className="dynamic-input"
+          />
+        </div>
+        <div>
+          <label className='customer-details-label'>Género:</label>
+          <div className="gender-options">
+            <label className='customer-details-label'>
+              <input
+                type="radio"
+                name="gender"
+                value="masculino"
+                checked={formData.CUS_GENDER == 'masculino'}
+                onChange={() => setFormData((prevData) => ({
+                  ...prevData,
+                  CUS_GENDER: 'masculino',
+                }))}
+                style={{marginRight:'5px'}}
+              />
+              Masculino
+              <span className="radio-dot"></span>
+            </label>
+            <label className='customer-details-label'>
+              <input
+                type="radio"
+                name="gender"
+                value="femenino"
+                checked={formData.CUS_GENDER == 'femenino'}
+                onChange={() => setFormData((prevData) => ({
+                  ...prevData,
+                  CUS_GENDER: 'femenino',
+                }))}
+                style={{marginRight:'5px'}}
+              />
+              Femenino
+              <span className="radio-dot"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
-</div>
-
-            </div>
-          )}
-    </div>
 )}
+
 {activeStep === 4 && (
   <div className="appointment-summary">
   {/* Resumen Cita */}
