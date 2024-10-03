@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
 import 'rsuite/dist/rsuite.min.css';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SideMenu from './components/SideMenu/';
 import Login from './components/Login/';
+import SignUp from "./components/SignUp/";
 import Swal from 'sweetalert2';
 
 function App() {
@@ -50,6 +51,10 @@ function App() {
   return (
     <Router>
       {isAuthenticated ? <SideMenu /> : <Login onLogin={handleLogin} />}
+      
+      <Routes>
+        <Route path="/signup" element={<SignUp />} />
+      </Routes>
     </Router>
   );
 }

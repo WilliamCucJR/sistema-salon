@@ -20,6 +20,7 @@ import Customer from "../Customer";
 import Store from "../Store";
 import Payment from "../Payment";
 import Appointment from "../Appointment";
+import SignUp from "../SignUp";
 import userIcon from "../../assets/user-icon.png";
 import logoSistema from "../../assets/logo-sistema.png";
 import "./SideMenu.css";
@@ -204,6 +205,10 @@ export default function SideMenu() {
             <Route 
               path="/appointment" 
               element={<Appointment isSidebarVisible={expanded} />}
+            />
+            <Route 
+              path="/signup" 
+              element={<SignUp isSidebarVisible={expanded} />}
             />
           </Routes>
         </Content>

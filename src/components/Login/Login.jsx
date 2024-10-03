@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FormField, Button, Form } from "semantic-ui-react";
 import Logo from "../../assets/logo-sistema.png";
 import "./Login.css";
 
+
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -13,7 +16,7 @@ export default function Login({ onLogin }) {
   };
 
   const handleRegister = () => {
-    console.log("Register");
+    navigate("/signup");
   };
 
   return (

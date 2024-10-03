@@ -92,7 +92,7 @@ const CustomerForm = ({
     CUS_DATE_OF_BIRTH: "",
     CUS_IMAGEN: "",
   });
-
+const [isCustomerSaved, setIsCustomerSaved] = useState(false);
   useEffect(() => {
     if (selectedItem) {
       const transformedData = selectedItem.reduce((acc, curr) => {
@@ -121,6 +121,41 @@ const CustomerForm = ({
     
     }
   }, [selectedItem]);
+  
+  useEffect(() => {
+    if (isCustomerSaved) {
+      const createUser = async () => {
+        const userUrl = `${urlBase}user/create`;
+        const adduser = await fetch(userUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+
+        if (adduser.ok) {
+          Swal.fire({
+            title: "Guardado",
+            text: "Registro enviado exitosamente y usuario creado!",
+            icon: "success",
+          });
+        } else {
+          Swal.fire({
+            title: "Advertencia",
+            text: "Cliente registrado, pero hubo un error al crear el usuario.",
+            icon: "warning",
+          });
+        }
+
+        setIsCustomerSaved(false); 
+        onFormSubmit();
+        closeModal();
+      };
+
+      createUser();
+    }
+  }, [isCustomerSaved]);
 
   const handleChange = (e, { name, value }) => {
     setFormData({ ...formData, [name]: value });
@@ -156,7 +191,6 @@ const CustomerForm = ({
     "CUS_CELLPHONE",
     "CUS_NIT",
     "CUS_DATE_OF_BIRTH",
-    "CUS_AFFILIATE",
   ];
 
   const missingFields = requiredFields.filter(
@@ -212,24 +246,17 @@ const CustomerForm = ({
     body: formDataToSend,
   });
 
-  if (response.ok) {
-    console.log("Registro guardado correctamente");
-
-    Swal.fire({
-      title: "Guardado",
-      text: "Registro enviado exitosamente!",
-      icon: "success",
-    });
-    onFormSubmit();
-    closeModal();
-  } else {
-    Swal.fire({
-      title: "Oops...",
-      text: "Algo ha salido mal, intenta de nuevo!",
-      icon: "error",
-    });
-    console.error("Error al enviar el formulario");
-  }
+ if (response.ok) {
+      console.log("Registro guardado correctamente");
+      setIsCustomerSaved(false); 
+    } else {
+      Swal.fire({
+        title: "Oops...",
+        text: "Algo ha salido mal, intenta de nuevo!",
+        icon: "error",
+      });
+      console.error("Error al enviar el formulario");
+    }
 };
   const panes = [
     {
