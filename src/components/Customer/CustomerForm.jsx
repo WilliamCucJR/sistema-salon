@@ -33,8 +33,6 @@ const CustomerForm = ({
     previewFile = `${urlFile}${previewImg}`;
   }
 
-  console.log(selectedItem);
-  console.log(previewFile);
 
   selectedItem.forEach((customer) => {
     const formatDate = (dateString) => {
@@ -68,8 +66,6 @@ const CustomerForm = ({
     { key: "f", text: "Femenino", value: "Femenino" },
   ];
 
-  console.log(selectedItem);
-
 
   const formScrollableDiv = {
     height: "400px",
@@ -92,6 +88,18 @@ const CustomerForm = ({
     CUS_DATE_OF_BIRTH: "",
     CUS_IMAGEN: "",
   });
+
+  const [usersData, setUsersData] = useState({
+    USE_ID: '',
+    USE_USER: "",
+    USE_EMAIL: "",
+    USE_PASSWORD: 'Password123',
+    USE_TYPE_USER: 1,
+  }); 
+
+  useEffect(() => {
+    console.log("usersData actualizado:", usersData);
+  }, [usersData]);
 
   useEffect(() => {
     if (selectedItem) {
@@ -117,11 +125,23 @@ const CustomerForm = ({
         CUS_AFFILIATE: transformedData.CUS_AFFILIATE || "",
         
       });
-
-    
     }
   }, [selectedItem]);
 
+    // Crear el USE_USER y copiar el email
+    useEffect(() => {
+      if (formData.CUS_FIRST_NAME && formData.CUS_LAST_NAME) {
+        const useUser = `${formData.CUS_FIRST_NAME[0]}${formData.CUS_LAST_NAME}`.toLowerCase();
+
+        setUsersData((prevState) => ({
+          ...prevState,
+          USE_USER: useUser,
+          USE_EMAIL: formData.CUS_EMAIL, 
+        }));
+      }
+    }, [formData.CUS_FIRST_NAME, formData.CUS_LAST_NAME, formData.CUS_EMAIL]);
+    
+    
   const handleChange = (e, { name, value }) => {
     setFormData({ ...formData, [name]: value });
   };
@@ -129,7 +149,7 @@ const CustomerForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("handleSubmit ejecutado");
-
+  
     // Mapeo de nombres de campos a textos de labels
     const fieldLabels = {
       CUS_EMAIL: "Correo",
@@ -143,94 +163,133 @@ const CustomerForm = ({
       CUS_DATE_OF_BIRTH: "Fecha de nacimiento",
       CUS_IMAGEN: "Imagen",
       CUS_AFFILIATE: "Afiliacion",
-
     };
- // Validación de campos requeridos
- const requiredFields = [
-    "CUS_EMAIL",
-    "CUS_FIRST_NAME",
-    "CUS_MIDDLE_NAME",
-    "CUS_LAST_NAME",
-    "CUS_SECONDLAST_NAME",
-    "CUS_GENDER",
-    "CUS_CELLPHONE",
-    "CUS_NIT",
-    "CUS_DATE_OF_BIRTH",
-    "CUS_AFFILIATE",
-  ];
-
-  const missingFields = requiredFields.filter(
-    (field) => !formData[field]
-  );
-
-  if (missingFields.length > 0) {
-    const missingFieldLabels = missingFields.map(
-      (field) => fieldLabels[field]
+  
+    // Validación de campos requeridos
+    const requiredFields = [
+      "CUS_EMAIL",
+      "CUS_FIRST_NAME",
+      "CUS_MIDDLE_NAME",
+      "CUS_LAST_NAME",
+      "CUS_SECONDLAST_NAME",
+      "CUS_GENDER",
+      "CUS_CELLPHONE",
+      "CUS_NIT",
+      "CUS_DATE_OF_BIRTH",
+      "CUS_AFFILIATE",
+    ];
+  
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field]
     );
-    Swal.fire({
-      title: "Error",
-      text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
-      icon: "error",
+  
+    if (missingFields.length > 0) {
+      const missingFieldLabels = missingFields.map(
+        (field) => fieldLabels[field]
+      );
+      Swal.fire({
+        title: "Error",
+        text: `Por favor complete los siguientes campos: ${missingFieldLabels.join(", ")}`,
+        icon: "error",
+      });
+      return;
+    }
+  
+    // Validación de formato de correo electrónico
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.CUS_EMAIL)) {
+      Swal.fire({
+        title: "Error",
+        text: "Por favor ingrese un correo electrónico válido.",
+        icon: "error",
+      });
+      return;
+    }
+  
+    // Determinamos el método y la URL para clientes
+    const isUpdatingClient = formData.CUS_ID ? true : false;
+    const clientMethod = isUpdatingClient ? "PUT" : "POST";
+    const clientUrl = `${urlBase}${catalogueType}${isUpdatingClient ? '/' + formData.CUS_ID : ''}`;
+  
+    // Crear FormData para cliente
+    const formDataToSend = new FormData();
+    formDataToSend.append("CUS_EMAIL", formData.CUS_EMAIL);
+    formDataToSend.append("CUS_FIRST_NAME", formData.CUS_FIRST_NAME);
+    formDataToSend.append("CUS_MIDDLE_NAME", formData.CUS_MIDDLE_NAME);
+    formDataToSend.append("CUS_LAST_NAME", formData.CUS_LAST_NAME);
+    formDataToSend.append("CUS_SECONDLAST_NAME", formData.CUS_SECONDLAST_NAME);
+    formDataToSend.append("CUS_GENDER", formData.CUS_GENDER);
+    formDataToSend.append("CUS_CELLPHONE", formData.CUS_CELLPHONE);
+    formDataToSend.append("CUS_NIT", formData.CUS_NIT);
+    formDataToSend.append("CUS_DATE_OF_BIRTH", formData.CUS_DATE_OF_BIRTH);
+    formDataToSend.append("CUS_AFFILIATE", formData.CUS_AFFILIATE);
+    if (selectedFile) {
+      formDataToSend.append("CUS_IMAGEN", selectedFile);
+    }
+  
+    // Enviar datos de cliente
+    const responseClient = await fetch(clientUrl, {
+      method: clientMethod,
+      body: formDataToSend,
     });
-    return;
-  }
- // Validación de formato de correo electrónico
- const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
- if (!emailRegex.test(formData.CUS_EMAIL)) {
-   Swal.fire({
-     title: "Error",
-     text: "Por favor ingrese un correo electrónico válido.",
-     icon: "error",
-   });
-   return;
- }
-
-  // Lógica para enviar los datos al API
-  const method = formData.CUS_ID ? "PUT" : "POST";
-  const url = formData.CUS_ID
-    ? `${urlBase}${catalogueType}/${formData.CUS_ID}`
-    : `${urlBase}${catalogueType}`;
-
-  const formDataToSend = new FormData();
-  formDataToSend.append("CUS_EMAIL", formData.CUS_EMAIL);
-  formDataToSend.append("CUS_FIRST_NAME", formData.CUS_FIRST_NAME);
-  formDataToSend.append("CUS_MIDDLE_NAME", formData.CUS_MIDDLE_NAME);
-  formDataToSend.append("CUS_LAST_NAME", formData.CUS_LAST_NAME);
-  formDataToSend.append("CUS_SECONDLAST_NAME", formData.CUS_SECONDLAST_NAME);
-  formDataToSend.append("CUS_GENDER", formData.CUS_GENDER);
-  formDataToSend.append("CUS_CELLPHONE", formData.CUS_CELLPHONE);
-  formDataToSend.append("CUS_NIT", formData.CUS_NIT);
-  formDataToSend.append("CUS_DATE_OF_BIRTH", formData.CUS_DATE_OF_BIRTH);
-  formDataToSend.append("CUS_AFFILIATE", formData.CUS_AFFILIATE);
-
-  if (selectedFile) {
-   formDataToSend.append("CUS_IMAGEN", selectedFile);
-  }
-
-  const response = await fetch(url, {
-    method: method,
-    body: formDataToSend,
-  });
-
-  if (response.ok) {
-    console.log("Registro guardado correctamente");
-
-    Swal.fire({
-      title: "Guardado",
-      text: "Registro enviado exitosamente!",
-      icon: "success",
-    });
-    onFormSubmit();
-    closeModal();
-  } else {
-    Swal.fire({
-      title: "Oops...",
-      text: "Algo ha salido mal, intenta de nuevo!",
-      icon: "error",
-    });
-    console.error("Error al enviar el formulario");
-  }
-};
+  
+    // Manejo de la respuesta del cliente
+    if (responseClient.ok) {
+      console.log("Registro de cliente guardado correctamente");
+  
+      // Solo crear usuario si se está creando un nuevo cliente
+      if (!isUpdatingClient) {
+        const userMethod = usersData.USE_ID ? "PUT" : "POST";
+        const userUrl = `${urlBase}users${usersData.USE_ID ? '/' + usersData.USE_ID : ''}`;
+  
+        // Enviar datos de usuario
+        const responseUser = await fetch(userUrl, {
+          method: userMethod,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(usersData),
+        });
+  
+        // Manejo de la respuesta del usuario
+        if (responseUser.ok) {
+          console.log("Registro de usuario guardado correctamente");
+          Swal.fire({
+            title: "Guardado",
+            text: "Registro enviado exitosamente!",
+            icon: "success",
+          });
+        } else {
+          Swal.fire({
+            title: "Usuario no ingresado...",
+            text: "Algo ha salido mal, intenta de nuevo!",
+            icon: "error",
+          });
+          console.error("Error al enviar el formulario de usuario");
+        }
+      } else {
+        // Si se actualiza solo el cliente, mostrar mensaje de éxito
+        Swal.fire({
+          title: "Actualizado",
+          text: "Información del cliente actualizada exitosamente!",
+          icon: "success",
+        });
+      }
+  
+      onFormSubmit();
+      closeModal();
+    } else {
+      Swal.fire({
+        title: "Cliente no ingresado...",
+        text: "Algo ha salido mal, intenta de nuevo!",
+        icon: "error",
+      });
+      console.error("Error al enviar el formulario de cliente");
+    }
+  };
+  
+  
+  
+  
+  
   const panes = [
     {
       menuItem: "Datos Generales",

@@ -153,44 +153,50 @@ export default function CatalogueTable({
 
   const handleDelete = async (id) => {
     console.log("Entro a la funcion con id ", id);
-
-    try {
-      const response = await fetch(`${urlBase}${catalogueType}/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      Swal.fire({
-        title: "¿Estás seguro?",
-        text: "!No podrás revertir los cambios!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Si, eliminarlo!",
-        cancelButtonText: "Cancelar"
-      }).then((result) => {
-        if (result.isConfirmed) {
+  
+    // Preguntar al usuario si está seguro de eliminar el registro
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "!No podrás revertir los cambios!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, eliminarlo!",
+      cancelButtonText: "Cancelar"
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // Solo ejecutamos la eliminación si el usuario confirmó
+          const response = await fetch(`${urlBase}${catalogueType}/${id}`, {
+            method: "DELETE",
+          });
+  
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+  
           Swal.fire({
             title: "Eliminado!",
             text: "Registro eliminado correctamente!",
             icon: "success"
           });
+  
+          // Volver a cargar los datos después de eliminar
+          fetchData();
+        } catch (error) {
+          Swal.fire({
+            title: "Oops...",
+            text: "Algo ha salido mal, intenta de nuevo!",
+            icon: "error",
+          });
+          console.log("Error al eliminar el registro", error);
+          setError(error);
         }
-      });
-      fetchData();
-    } catch (error) {
-      Swal.fire({
-        title: "Oops...",
-        text: "Algo ha salido mal, intenta de nuevo!",
-        icon: "error",
-      });
-      console.log("Error al eliminar el registro", error);
-      setError(error);
-    }
+      }
+    });
   };
+  
 
   const fields = catalogueFields[catalogueType]?.apiFields || [];
   const headers = catalogueFields[catalogueType]?.tableHeaders || [];
