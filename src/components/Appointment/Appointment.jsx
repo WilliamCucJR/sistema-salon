@@ -47,6 +47,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     SER_ID: "",
     DAT_START: "",
     DAT_END: "",
+    DAT_STATUS: 0,
   }); 
 
   const [orderData, setOrderData] = useState({
@@ -58,7 +59,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     SER_ID: "",
     ORD_QUANTITY: 1,
     ORD_TOTAL: "",
-    ORD_STATUS: 1,
+    ORD_STATUS: 0,
   }); 
  
   // Estado para almacenar
@@ -71,6 +72,10 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");   
+
+  const [appointments, setAppointments] = useState([]);
+  const [filteredAppointments, setFilteredAppointments] = useState([]);
+  const [disabledTimes, setDisabledTimes] = useState([]);
 
   // Identificador de pasos (Steps)
   const steps = [
@@ -239,6 +244,57 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
       console.log("Fin Cita:", endMySQLTimestamp);
     }
   };
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`${urlBase}dates`);
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Error al obtener las citas:", error);
+      }
+    };
+  
+    if (selectedEmployee) {
+      const employeeAppointments = appointments.filter(
+        (appointment) => appointment.EMP_ID === selectedEmployee.EMP_ID
+      );
+      setFilteredAppointments(employeeAppointments);
+    }
+  
+    fetchAppointments();
+  }, [selectedEmployee, appointments, urlBase]);
+  
+
+  // Filtrar y deshabilitar horas ocupadas por el empleado en la fecha seleccionada
+  useEffect(() => {
+    if (selectedDate && filteredAppointments.length > 0) {
+      const selectedDateObj = new Date(selectedDate);
+  
+      const busyTimes = filteredAppointments
+        .filter(appointment => {
+          const appointmentDate = new Date(appointment.DAT_START);
+          return appointmentDate.toDateString() === selectedDateObj.toDateString();
+        })
+        .map(appointment => {
+          const appointmentTime = new Date(appointment.DAT_START).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false, // Para obtener formato de 24 horas
+          });
+          return appointmentTime;
+        });
+  
+      setDisabledTimes(busyTimes);
+    } else {
+      setDisabledTimes([]);
+    }
+  }, [selectedDate, filteredAppointments]);
+  
+  
+
+
     // Llamadas a la API para obtener Clientes
     useEffect(() => {
       const fetchCustomers = async () => {
@@ -402,13 +458,15 @@ const handleSubmit = async (e) => {
             {selectedDate && (
               <div className="time-slots">
                 {Array.from({ length: 14 }, (_, index) => {
-                  const hour = 7 + index;    
-                  const timeString = `${hour}:00`;
+                  const hour = 7 + index;
+                  const timeString = `${String(hour).padStart(2, '0')}:00`;  // Formato de 24 horas
+                  const isDisabled = disabledTimes.includes(timeString);
+
                   return (
                     <div
                       key={timeString}
-                      className={`time-slot ${selectedTime === timeString ? 'selected' : ''}`}
-                      onClick={() => handleTimeSelect(timeString)}
+                      className={`time-slot ${isDisabled ? 'disabled' : ''} ${selectedTime === timeString ? 'selected' : ''}`}
+                      onClick={() => !isDisabled && handleTimeSelect(timeString)}
                     >
                       {timeString} {hour < 12 ? "AM" : "PM"}
                     </div>

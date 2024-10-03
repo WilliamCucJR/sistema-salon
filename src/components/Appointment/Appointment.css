@@ -220,6 +220,13 @@
     border: 2px solid #008080; 
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
 }
+.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    background-color: #f0f0f0; 
+    border: 1px dotted;
+    text-decoration: line-through;
+  }
 .customer-container, .customer-details {
     background-color: #f0f0f0; 
     border-radius: 10px;
