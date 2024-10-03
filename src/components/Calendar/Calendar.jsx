@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
@@ -6,6 +6,7 @@ import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import es from "date-fns/locale/es";
+import '../Calendar/Calendar.css'
 
 const messages = {
   allDay: "Todo el día",
@@ -122,19 +123,23 @@ export default function AppointmentCalendar({ onSelectSlot }) {
   };
 
   const filteredEvents = selectedEmployee
-    ? events.filter(event => event.employeeId === selectedEmployee)
+    ? events.filter(event => event.employeeId == selectedEmployee)
     : events;
 
   return (
-    <div style={{ height: '500px' }}>
-      <select onChange={handleEmployeeChange} value={selectedEmployee}>
-        <option value="">Todos los empleados</option>
-        {employees.map(employee => (
-          <option key={employee.EMP_ID} value={employee.EMP_ID}>
-            {employee.EMP_FIRST_NAME} {employee.EMP_LAST_NAME}
-          </option>
-        ))}
-      </select>
+    <div style={{ height: '450px', width: '88rem' }}>
+    <div className='filter'>
+      <label>Filtrar por: </label>
+        <select onChange={handleEmployeeChange} value={selectedEmployee} className='filter-by-employee'>
+          <option value="">Todos los empleados</option>
+          {employees.map(employee => (
+            <option key={employee.EMP_ID} value={employee.EMP_ID}>
+              {employee.EMP_FIRST_NAME} {employee.EMP_LAST_NAME}
+            </option>
+          ))}
+        </select>
+    </div>
+    
       <Calendar
         localizer={localizer}
         culture="es"

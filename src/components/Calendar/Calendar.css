@@ -1,0 +1,13 @@
+.filter{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 48px;
+}
+.filter-by-employee{
+    border: 1px solid rgb(214, 206, 206);
+    border-radius: 5px;
+    padding: 7px;
+    margin-left: 7px;
+    width: 200px;
+}
