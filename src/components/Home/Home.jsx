@@ -50,7 +50,7 @@ const Home = () => {
         </Grid.Column>
       </Grid>
         <InstagramButton
-                href="https://www.instagram.com/cul4s_de_freefire/?hl=es-la"
+                href="https://www.instagram.com/netobranbarbershop/"
                 target="_blank"
                 rel="noopener noreferrer"
             >

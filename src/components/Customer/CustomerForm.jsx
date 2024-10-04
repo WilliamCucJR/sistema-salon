@@ -10,6 +10,7 @@ import {
   Icon,
 } from "semantic-ui-react";
 import Swal from "sweetalert2";
+import emailjs from 'emailjs-com';
 import FileInput from '../FileInput/FileInput';
 
 const CustomerForm = ({
@@ -162,7 +163,6 @@ const CustomerForm = ({
       CUS_NIT: "NIT",
       CUS_DATE_OF_BIRTH: "Fecha de nacimiento",
       CUS_IMAGEN: "Imagen",
-      CUS_AFFILIATE: "Afiliacion",
     };
   
     // Validación de campos requeridos
@@ -252,28 +252,43 @@ const CustomerForm = ({
         // Manejo de la respuesta del usuario
         if (responseUser.ok) {
           console.log("Registro de usuario guardado correctamente");
-          Swal.fire({
-            title: "Guardado",
-            text: "Registro enviado exitosamente!",
-            icon: "success",
-          });
+          emailjs
+            .send(
+              "service_s6s0yum", // Service ID
+              "template_i8huz09", // Template ID
+              {
+                to_name: `${formData.CUS_FIRST_NAME} ${formData.CUS_LAST_NAME}`,
+                to_email: formData.CUS_EMAIL,
+                user_name: usersData.USE_USER,
+                user_password: usersData.USE_PASSWORD,
+              },
+              "aw96N_rEx3zUIX08l" // Public Key
+            )
+            .then(
+              () => {
+                Swal.fire({
+                  title: "Guardado",
+                  text: "Registro enviado exitosamente y correo enviado!",
+                  icon: "success",
+                });
+              },
+              (error) => {
+                console.error("Error al enviar correo", error);
+                Swal.fire({
+                  title: "Usuario ingresado, pero correo no enviado...",
+                  text: "Algo ha salido mal con el correo, intenta de nuevo!",
+                  icon: "error",
+                });
+              }
+            );
         } else {
           Swal.fire({
             title: "Usuario no ingresado...",
             text: "Algo ha salido mal, intenta de nuevo!",
             icon: "error",
           });
-          console.error("Error al enviar el formulario de usuario");
         }
-      } else {
-        // Si se actualiza solo el cliente, mostrar mensaje de éxito
-        Swal.fire({
-          title: "Actualizado",
-          text: "Información del cliente actualizada exitosamente!",
-          icon: "success",
-        });
       }
-  
       onFormSubmit();
       closeModal();
     } else {
@@ -282,7 +297,6 @@ const CustomerForm = ({
         text: "Algo ha salido mal, intenta de nuevo!",
         icon: "error",
       });
-      console.error("Error al enviar el formulario de cliente");
     }
   };
   
