@@ -38,7 +38,6 @@ export default function Payment() {
     cardNumber: "",
     expiryDate: "",
     securityCode: "",
-    acceptTerms: false,
   });
 
   const handleInputChange = (e) => {
@@ -386,8 +385,6 @@ export default function Payment() {
                   control={Checkbox}
                   label={{ children: "Acepto los términos y condiciones" }}
                   name="acceptTerms"
-                  checked={formData.acceptTerms}
-                  onChange={handleInputChange}
                 />
                 <Button
                   type="submit"
