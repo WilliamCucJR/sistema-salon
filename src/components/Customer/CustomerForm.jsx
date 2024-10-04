@@ -163,7 +163,6 @@ const CustomerForm = ({
       CUS_NIT: "NIT",
       CUS_DATE_OF_BIRTH: "Fecha de nacimiento",
       CUS_IMAGEN: "Imagen",
-      CUS_AFFILIATE: "Afiliacion",
     };
   
     // Validación de campos requeridos
