@@ -365,6 +365,7 @@ const handleSubmit = async (e) => {
       });
       onFormSubmit();
       onClose();
+      window.location.reload();
   } else {
       Swal.fire({
           title: "Oops...",
@@ -393,7 +394,12 @@ const handleSubmit = async (e) => {
               className={index < activeStep ? 'completed' : index === activeStep ? 'active' : 'pending'}
             >
               <div className="step-circle">
-                {index < activeStep ? <Icon name="check circle" size="large" /> : <span>{index + 1}</span>}
+                {index < activeStep ? 
+                <Icon 
+                name="check circle" 
+                size="big" 
+                style={{ color: '#00B600', border: '1px solid white', backgroundColor: 'white', borderRadius: '50%'  }} 
+                /> : <span>{index + 1}</span>}
               </div>
               <div className="step-info">
                 <h3>{step.title}</h3>
@@ -420,7 +426,7 @@ const handleSubmit = async (e) => {
                 className="service-image" 
               />
                 <h3 className='service-title'>{service.SER_SERVICENAME}</h3>
-                <p>Q {service.SER_VALUE}</p>
+                <p className='select-service-price'>Q {service.SER_VALUE}</p>
               </div>
             ))}
           </div>

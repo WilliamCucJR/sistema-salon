@@ -28,6 +28,11 @@ export default function SideMenu() {
   const [expanded, setExpanded] = useState(true);
 
   const toggleSidebar = () => setExpanded(!expanded);
+  
+  const closeSession = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -146,10 +151,11 @@ export default function SideMenu() {
                 </Nav.Item>
                 <Nav.Item
                   as={Link}
-                  to="/employees"
+                  to="/"
                   eventKey="9"
                   icon={<ExitIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
+                  onClick={closeSession}
                 >
                   Salir
                 </Nav.Item>

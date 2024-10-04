@@ -44,7 +44,7 @@
     max-height: 570px; 
     background-color: #9eb5b0;
     padding: 20px;
-    color: white;
+    color:#343434;
     border-radius: 10px;
     flex-shrink: 0;
 }
@@ -65,33 +65,14 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid #ffffff; 
+    border: 1px solid #343434; 
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 10px;
     flex-shrink: 0;
-}
-
-.step-circle.completed {
-    background-color: #4CAF50;
-    color: white;
-    line-height: 24px; 
-    font-size: 14px;  
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.step-circle.active {
-    background-color: #ffffff; 
-    color: #000000; 
-}
-
-
-.step-circle.pending {
-    background-color: transparent; 
-    border-color: #ffffff; 
+    background-color: #f0f0f04d;
+    color: #343434;
 }
 
 
@@ -114,7 +95,10 @@
 
 
 .step-sidebar li.active .step-circle {
-    background-color: #343434; 
+    background-color: white; 
+    color: #343434;
+    border: 1px solid white;
+    
 }
 .step-sidebar li.active .step-info h3,
 .step-sidebar li.active .step-info p {
@@ -160,7 +144,10 @@
     margin: 0;  
     padding: 5px 0;   
     white-space: normal; 
-  }
+}
+.select-service-price{
+    font-weight: bold;
+}
 
 .service-card:hover {
     transform: scale(1.05);
