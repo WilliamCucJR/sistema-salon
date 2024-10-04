@@ -247,7 +247,7 @@ export default function Payment() {
       if (error === 1) {
         Swal.fire({
           title: "Error",
-          text: "La fecha de vencimiento no puede ser menor a la fecha actual y el mes debe estar entre 01 y 12",
+          text: "Fecha de vencimiento invalida",
           icon: "error",
         });
       }
