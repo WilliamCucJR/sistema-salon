@@ -38,7 +38,6 @@ export default function Payment() {
     cardNumber: "",
     expiryDate: "",
     securityCode: "",
-    acceptTerms: false,
   });
 
   const handleInputChange = (e) => {
@@ -223,6 +222,44 @@ export default function Payment() {
       value = value.slice(0, 5);
     }
 
+    let [month, year] = value.split("/");
+    let today = new Date();
+    let currentYear = today.getFullYear() % 100;
+    let currentMonth = today.getMonth() + 1;
+    let error = 0;
+
+    if (value.length === 5) {
+      if (month && year) {
+        if (parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
+          error = 1;
+        } else {
+          if (parseInt(year, 10) < currentYear) {
+            error = 1;
+          } else if (
+            parseInt(year, 10) === currentYear &&
+            parseInt(month, 10) < currentMonth
+          ) {
+            error = 1;
+          }
+        }
+      }
+
+      if (error === 1) {
+        Swal.fire({
+          title: "Error",
+          text: "La fecha de vencimiento no puede ser menor a la fecha actual y el mes debe estar entre 01 y 12",
+          icon: "error",
+        });
+      }
+    }
+
+    console.log("Fecha de vencimiento:", value);
+    console.log("Mes:", month);
+    console.log("Año:", year);
+    console.log("Mes actual:", currentMonth);
+    console.log("Año actual:", currentYear);
+    console.log("Error:", error);
+
     setFormData({
       ...formData,
       expiryDate: value,
@@ -336,7 +373,11 @@ export default function Payment() {
                     placeholder="Teléfono"
                     name="phone"
                     value={formData.phone}
-                    onChange={handleInputChange}
+                    onChange={(e, { value }) => {
+                      if (/^\d{0,8}$/.test(value)) {
+                        handleInputChange(e, { name: "phone", value });
+                      }
+                    }}
                   />
                   <FormField
                     id="form-input-control-nit"
@@ -345,7 +386,12 @@ export default function Payment() {
                     placeholder="NIT"
                     name="nit"
                     value={formData.nit}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      if (/^[a-zA-Z0-9-]{0,10}$/.test(value)) {
+                        handleInputChange(e, { name: "nit", value });
+                      }
+                    }}
                   />
                 </FormGroup>
                 <FormGroup widths="equal">
@@ -386,8 +432,6 @@ export default function Payment() {
                   control={Checkbox}
                   label={{ children: "Acepto los términos y condiciones" }}
                   name="acceptTerms"
-                  checked={formData.acceptTerms}
-                  onChange={handleInputChange}
                 />
                 <Button
                   type="submit"
