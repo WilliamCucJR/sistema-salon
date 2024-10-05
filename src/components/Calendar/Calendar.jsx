@@ -123,7 +123,7 @@ export default function AppointmentCalendar() {
       
           return {
             id: event.DAT_ID,
-            title: `${customerName}, ${employeeName}, ${serviceName}`, // Solo incluir los nombres
+            title: `Cliente: ${customerName}, Empleado: ${employeeName}, Servicio:  ${serviceName}`, // Solo incluir los nombres
             start: new Date(event.DAT_START),
             end: new Date(event.DAT_END),
             employeeId: event.EMP_ID,
@@ -168,9 +168,9 @@ export default function AppointmentCalendar() {
           &times;
         </button>
         <div style="text-align: left; margin-top: 5px;">
-          <p><strong>Cliente:</strong> ${event.title.split(', ')[0]}</p> <!-- Solo el nombre del cliente -->
-          <p><strong>Empleado:</strong> ${event.title.split(', ')[1]}</p> <!-- Solo el nombre del empleado -->
-          <p><strong>Servicio:</strong> ${event.title.split(', ')[2]}</p> <!-- Solo el nombre del servicio -->
+          <p>${event.title.split(', ')[0]}</p> <!-- Solo el nombre del cliente -->
+          <p> ${event.title.split(', ')[1]}</p> <!-- Solo el nombre del empleado -->
+          <p> ${event.title.split(', ')[2]}</p> <!-- Solo el nombre del servicio -->
           <p><strong>Estado:</strong> ${event.status === 1 ? 'Agendada' : event.status === 2 ? 'Completada' : 'Cancelada'}</p>
           <div style="margin-top: 20px; text-align: right;">
             <button id="completeBtn" class="swal2-confirm swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : 'background-color: teal;'}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Atender Cita</button>
