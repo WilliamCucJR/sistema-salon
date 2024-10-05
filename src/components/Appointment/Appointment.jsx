@@ -596,7 +596,7 @@ const handleSubmit = async (e) => {
       <div className='service-price'>
         {selectedService.SER_SERVICENAME} <span className='service-value'> Q{selectedService.SER_VALUE}</span> 
       </div>
-      <strong>Impuestoss </strong>
+      <strong>Impuestos </strong>
       <div className='service-price'>
       IVA<span className='service-value tax'> Q 0.00</span> 
       </div>

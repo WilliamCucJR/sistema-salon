@@ -176,7 +176,6 @@ const CustomerForm = ({
       "CUS_CELLPHONE",
       "CUS_NIT",
       "CUS_DATE_OF_BIRTH",
-      "CUS_AFFILIATE",
     ];
   
     const missingFields = requiredFields.filter(

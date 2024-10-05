@@ -41,7 +41,7 @@ export default function AppointmentCalendar() {
   const [services, setServices] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [employeeColors, setEmployeeColors] = useState({});
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const currentTime = useState(new Date());
 
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
 
@@ -106,33 +106,33 @@ export default function AppointmentCalendar() {
         const data = await response.json();
 
         const formattedEvents = data
-          .filter(event => event.DAT_STATUS !== 0) // Filtrar las citas canceladas
-          .map(event => {
-            const customer = customers.find(c => c.CUS_ID === event.CUS_ID);
-            const employee = employees.find(e => e.EMP_ID === event.EMP_ID);
-            const service = services.find(s => s.SER_ID === event.SER_ID);
-            const customerName = customer ? `${customer.CUS_FIRST_NAME} ${customer.CUS_LAST_NAME}` : 'Cliente Desconocido';
-            const employeeName = employee ? `${employee.EMP_FIRST_NAME} ${employee.EMP_LAST_NAME}` : 'Empleado Desconocido';
-            const serviceName = service ? service.SER_SERVICENAME : 'Servicio Desconocido';
-            const isPast = new Date(event.DAT_END) < currentTime; // Verificar si la cita ya pasó
-
-            if (isPast && event.DAT_STATUS !== 2) {
-              // Cambiar automatico de estado
-              updateEventStatus(event.DAT_ID, 2); 
-            }
-
-            return {
-              id: event.DAT_ID,
-              title: `Cliente: ${customerName}, Empleado: ${employeeName}, Servicio: ${serviceName}`,
-              start: new Date(event.DAT_START),
-              end: new Date(event.DAT_END),
-              employeeId: event.EMP_ID,
-              status: event.DAT_STATUS,
-              isPast: isPast
-            };
-          });
-
-        setEvents(formattedEvents);
+        .filter(event => event.DAT_STATUS !== 0) // Filtrar las citas canceladas
+        .map(event => {
+          const customer = customers.find(c => c.CUS_ID === event.CUS_ID);
+          const employee = employees.find(e => e.EMP_ID === event.EMP_ID);
+          const service = services.find(s => s.SER_ID === event.SER_ID);
+          const customerName = customer ? `${customer.CUS_FIRST_NAME} ${customer.CUS_LAST_NAME}` : 'Cliente Desconocido';
+          const employeeName = employee ? `${employee.EMP_FIRST_NAME} ${employee.EMP_LAST_NAME}` : 'Empleado Desconocido';
+          const serviceName = service ? service.SER_SERVICENAME : 'Servicio Desconocido';
+          const isPast = new Date(event.DAT_END) < currentTime; // Verificar si la cita ya pasó
+      
+          if (isPast && event.DAT_STATUS !== 2) {
+            // Cambiar automatico de estado
+            updateEventStatus(event.DAT_ID, 2); 
+          }
+      
+          return {
+            id: event.DAT_ID,
+            title: `${customerName}, ${employeeName}, ${serviceName}`, // Solo incluir los nombres
+            start: new Date(event.DAT_START),
+            end: new Date(event.DAT_END),
+            employeeId: event.EMP_ID,
+            status: event.DAT_STATUS,
+            isPast: isPast
+          };
+        });
+      
+      setEvents(formattedEvents);
       } catch (error) {
         console.error('Error fetching events:', error);
       }
@@ -167,13 +167,15 @@ export default function AppointmentCalendar() {
         >
           &times;
         </button>
-        <div style="text-align: left; margin-top: 20px;">
-          <p><strong>Cliente:</strong> ${event.title.split(', ')[0]}</p>
-          <p><strong>Empleado:</strong> ${event.title.split(', ')[1]}</p>
-          <p><strong>Servicio:</strong> ${event.title.split(', ')[2]}</p>
+        <div style="text-align: left; margin-top: 5px;">
+          <p><strong>Cliente:</strong> ${event.title.split(', ')[0]}</p> <!-- Solo el nombre del cliente -->
+          <p><strong>Empleado:</strong> ${event.title.split(', ')[1]}</p> <!-- Solo el nombre del empleado -->
+          <p><strong>Servicio:</strong> ${event.title.split(', ')[2]}</p> <!-- Solo el nombre del servicio -->
           <p><strong>Estado:</strong> ${event.status === 1 ? 'Agendada' : event.status === 2 ? 'Completada' : 'Cancelada'}</p>
-          <button id="completeBtn" class="swal2-confirm swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : ''}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Completar</button>
-          <button id="cancelBtn" class="swal2-cancel swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : ''}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Cancelar</button>
+          <div style="margin-top: 20px; text-align: right;">
+            <button id="completeBtn" class="swal2-confirm swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : 'background-color: teal;'}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Atender Cita</button>
+            <button id="cancelBtn" class="swal2-cancel swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : 'background-color: #C86F11; '}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Cancelar Cita</button>
+          </div>
         </div>
       `,
       showCancelButton: false,
