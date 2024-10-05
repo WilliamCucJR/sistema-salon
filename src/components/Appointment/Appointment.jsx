@@ -47,7 +47,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     SER_ID: "",
     DAT_START: "",
     DAT_END: "",
-    DAT_STATUS: 0,
+    DAT_STATUS: 1,
   }); 
 
   const [orderData, setOrderData] = useState({

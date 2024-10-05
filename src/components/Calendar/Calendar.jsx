@@ -6,8 +6,8 @@ import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import es from "date-fns/locale/es";
-import Swal from 'sweetalert2';  
-import '../Calendar/Calendar.css'
+import Swal from 'sweetalert2';
+import '../Calendar/Calendar.css';
 
 const messages = {
   allDay: "Todo el día",
@@ -34,81 +34,70 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-export default function AppointmentCalendar({ onSelectSlot }) {
+export default function AppointmentCalendar() {
   const [events, setEvents] = useState([]);
-  const [customers, setCustomers] = useState([]); 
-  const [employees, setEmployees] = useState([]); 
+  const [customers, setCustomers] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [services, setServices] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState('');
-  const [employeeColors, setEmployeeColors] = useState({}); 
+  const [employeeColors, setEmployeeColors] = useState({});
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
-
-  const generateRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-
-  const getBrightness = (hex) => {
-    const color = hex.replace('#', '');
-    const r = parseInt(color.substring(0, 2), 16);
-    const g = parseInt(color.substring(2, 4), 16);
-    const b = parseInt(color.substring(4, 6), 16);
-    return (r * 299 + g * 587 + b * 114) / 1000;  
-  };
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await fetch(`${urlBase}/customers`); 
+        const response = await fetch(`${urlBase}/customers`);
         const customerData = await response.json();
-        setCustomers(customerData);  
+        setCustomers(customerData);
       } catch (error) {
         console.error("Error al obtener los clientes:", error);
       }
     };
 
-    fetchCustomers();
-  }, [urlBase]);
-
-  useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await fetch(`${urlBase}/employees`); 
+        const response = await fetch(`${urlBase}/employees`);
         const employeeData = await response.json();
-        
-        setEmployees(employeeData);  
-
-        const colors = {};
-        employeeData.forEach(employee => {
-          colors[employee.EMP_ID] = generateRandomColor();
-        });
-        setEmployeeColors(colors);
+        setEmployees(employeeData);
+        generateRandomColors(employeeData); // Generar colores aleatorios para empleados
       } catch (error) {
         console.error("Error al obtener los empleados:", error);
       }
     };
 
-    fetchEmployees();
-  }, [urlBase]);
-
-  useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${urlBase}/services`); 
+        const response = await fetch(`${urlBase}/services`);
         const serviceData = await response.json();
-        setServices(serviceData);  
+        setServices(serviceData);
       } catch (error) {
         console.error("Error al obtener los servicios:", error);
       }
     };
 
+    fetchCustomers();
+    fetchEmployees();
     fetchServices();
   }, [urlBase]);
+
+  const generateRandomColors = (employees) => {
+    const newColors = {};
+    employees.forEach(employee => {
+      const color = '#' + Math.floor(Math.random() * 16777215).toString(16); // Color aleatorio
+      newColors[employee.EMP_ID] = color;
+    });
+    setEmployeeColors(newColors);
+  };
+
+  const isLightColor = (color) => {
+    const r = parseInt(color.substring(1, 3), 16);
+    const g = parseInt(color.substring(3, 5), 16);
+    const b = parseInt(color.substring(5, 7), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 155;
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -116,22 +105,32 @@ export default function AppointmentCalendar({ onSelectSlot }) {
         const response = await fetch(`${urlBase}/dates`);
         const data = await response.json();
 
-        const formattedEvents = data.map(event => {
-          const customer = customers.find(c => c.CUS_ID === event.CUS_ID);
-          const employee = employees.find(e => e.EMP_ID === event.EMP_ID);
-          const service = services.find(s => s.SER_ID === event.SER_ID);
-          const customerName = customer ? `${customer.CUS_FIRST_NAME} ${customer.CUS_LAST_NAME}` : 'Cliente Desconocido';
-          const employeeName = employee ? `${employee.EMP_FIRST_NAME} ${employee.EMP_LAST_NAME}` : 'Empleado Desconocido'; 
-          const serviceName = service ? service.SER_SERVICENAME : 'Servicio Desconocido';
+        const formattedEvents = data
+          .filter(event => event.DAT_STATUS !== 0) // Filtrar las citas canceladas
+          .map(event => {
+            const customer = customers.find(c => c.CUS_ID === event.CUS_ID);
+            const employee = employees.find(e => e.EMP_ID === event.EMP_ID);
+            const service = services.find(s => s.SER_ID === event.SER_ID);
+            const customerName = customer ? `${customer.CUS_FIRST_NAME} ${customer.CUS_LAST_NAME}` : 'Cliente Desconocido';
+            const employeeName = employee ? `${employee.EMP_FIRST_NAME} ${employee.EMP_LAST_NAME}` : 'Empleado Desconocido';
+            const serviceName = service ? service.SER_SERVICENAME : 'Servicio Desconocido';
+            const isPast = new Date(event.DAT_END) < currentTime; // Verificar si la cita ya pasó
 
-          return {
-            id: event.DAT_ID,
-            title: `Cliente: ${customerName}, Empleado: ${employeeName}, Servicio: ${serviceName}`,
-            start: new Date(event.DAT_START), 
-            end: new Date(event.DAT_END),     
-            employeeId: event.EMP_ID
-          };
-        });
+            if (isPast && event.DAT_STATUS !== 2) {
+              // Cambiar automatico de estado
+              updateEventStatus(event.DAT_ID, 2); 
+            }
+
+            return {
+              id: event.DAT_ID,
+              title: `Cliente: ${customerName}, Empleado: ${employeeName}, Servicio: ${serviceName}`,
+              start: new Date(event.DAT_START),
+              end: new Date(event.DAT_END),
+              employeeId: event.EMP_ID,
+              status: event.DAT_STATUS,
+              isPast: isPast
+            };
+          });
 
         setEvents(formattedEvents);
       } catch (error) {
@@ -142,67 +141,74 @@ export default function AppointmentCalendar({ onSelectSlot }) {
     if (customers.length > 0 && employees.length > 0 && services.length > 0) {
       fetchEvents();
     }
-  }, [urlBase, customers, employees, services]);
+  }, [urlBase, customers, employees, services, currentTime]);
 
-  const handleEmployeeChange = (e) => {
-    setSelectedEmployee(e.target.value);
+  const updateEventStatus = async (eventId, status) => {
+    try {
+      await fetch(`${urlBase}/dates/${eventId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ DAT_STATUS: status })
+      });
+    } catch (error) {
+      console.error("Error al actualizar el estado de la cita:", error);
+    }
+  };
+
+  const handleEventClick = (event) => {
+    Swal.fire({
+      title: 'Detalles de la cita',
+      html: `
+        <button 
+          id="closeSwalBtn" 
+          style="position: absolute; top: 10px; right: 10px; font-size: 18px; background: none; border: none; cursor: pointer;"
+        >
+          &times;
+        </button>
+        <div style="text-align: left; margin-top: 20px;">
+          <p><strong>Cliente:</strong> ${event.title.split(', ')[0]}</p>
+          <p><strong>Empleado:</strong> ${event.title.split(', ')[1]}</p>
+          <p><strong>Servicio:</strong> ${event.title.split(', ')[2]}</p>
+          <p><strong>Estado:</strong> ${event.status === 1 ? 'Agendada' : event.status === 2 ? 'Completada' : 'Cancelada'}</p>
+          <button id="completeBtn" class="swal2-confirm swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : ''}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Completar</button>
+          <button id="cancelBtn" class="swal2-cancel swal2-styled" style="${event.status !== 1 || event.isPast ? 'background-color: grey; cursor: not-allowed;' : ''}" ${event.status !== 1 || event.isPast ? 'disabled' : ''}>Cancelar</button>
+        </div>
+      `,
+      showCancelButton: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        document.getElementById('closeSwalBtn').addEventListener('click', () => {
+          Swal.close();
+        });
+    
+        if (event.status === 1 && !event.isPast) {
+          document.getElementById('completeBtn').addEventListener('click', () => {
+            updateEventStatus(event.id, 2);
+            Swal.close();
+            window.location.reload();
+          });
+          document.getElementById('cancelBtn').addEventListener('click', () => {
+            updateEventStatus(event.id, 0); 
+            Swal.close();
+            window.location.reload();
+          });
+        }
+      }
+    });
+        
   };
 
   const filteredEvents = selectedEmployee
     ? events.filter(event => event.employeeId == selectedEmployee)
     : events;
 
-  const handleEventDelete = async (eventId) => {
-    try {
-      const response = await fetch(`${urlBase}/dates/${eventId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        setEvents(events.filter(event => event.id !== eventId));
-        Swal.fire('Cancelado', 'La cita ha sido cancelada.', 'success');
-      } else {
-        Swal.fire('Error', 'Hubo un problema al cancelar la cita.', 'error');
-      }
-    } catch (error) {
-      Swal.fire('Error', 'No se pudo cancelar la cita.', 'error');
-    }
-  };
-
-  const handleEventSelect = (event) => {
-    Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Quieres cancelar esta cita?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Sí, cancelar cita',
-      cancelButtonText: 'No, mantener'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        handleEventDelete(event.id);
-      }
-    });
-  };
-
- 
-  const eventPropGetter = (event) => {
-    const backgroundColor = employeeColors[event.employeeId] || '#000'; 
-    const brightness = getBrightness(backgroundColor); 
-    const isDark = brightness < 128; 
-
-    return {
-      style: { 
-        backgroundColor, 
-        color: isDark ? 'white' : 'black', 
-      }
-    };
-  };
-
   return (
     <div style={{ height: '450px', width: '88rem' }}>
       <div className='filter'>
         <label>Filtrar por: </label>
-        <select onChange={handleEmployeeChange} value={selectedEmployee} className='filter-by-employee'>
+        <select onChange={(e) => setSelectedEmployee(e.target.value)} value={selectedEmployee} className='filter-by-employee'>
           <option value="">Todos los empleados</option>
           {employees.map(employee => (
             <option key={employee.EMP_ID} value={employee.EMP_ID}>
@@ -211,7 +217,7 @@ export default function AppointmentCalendar({ onSelectSlot }) {
           ))}
         </select>
       </div>
-      
+
       <Calendar
         localizer={localizer}
         culture="es"
@@ -221,9 +227,20 @@ export default function AppointmentCalendar({ onSelectSlot }) {
         endAccessor="end"
         style={{ margin: '50px' }}
         selectable
-        onSelectSlot={onSelectSlot}
-        onSelectEvent={handleEventSelect}
-        eventPropGetter={eventPropGetter} 
+        onSelectEvent={handleEventClick}
+        eventPropGetter={(event) => {
+          const backgroundColor = employeeColors[event.employeeId] || '#3174ad'; 
+          const textColor = isLightColor(backgroundColor) ? 'black' : 'white'; 
+          
+          return {
+            style: {
+              backgroundColor: backgroundColor,
+              color: textColor,
+              textDecoration: event.status === 2 ? 'line-through' : 'none', // Tachado si está completada
+              opacity: event.isPast && event.status !== 2 ? 0.5 : 1, // Opacidad para citas pasadas
+            }
+          };
+        }}
       />
     </div>
   );
