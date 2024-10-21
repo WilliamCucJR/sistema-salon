@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Table, Button, Icon, Input, Pagination } from "semantic-ui-react";
 import "./CatalogueTable.css";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 export default function CatalogueTable({
   isSidebarVisible,
@@ -58,11 +58,16 @@ export default function CatalogueTable({
         "EMP_CELLPHONE",
         "EMP_NIT",
         "EMP_DATE_OF_BIRTH",
-        "EMP_IMAGEN"
+        "EMP_IMAGEN",
       ],
     },
-    customers: { 
-      apiFields: ["CUS_FIRST_NAME", "CUS_LAST_NAME", "CUS_EMAIL", "CUS_CELLPHONE"],
+    customers: {
+      apiFields: [
+        "CUS_FIRST_NAME",
+        "CUS_LAST_NAME",
+        "CUS_EMAIL",
+        "CUS_CELLPHONE",
+      ],
       tableHeaders: ["Nombre", "Apellido", "Email", "Telefono"],
       formInputs: [
         "CUS_ID",
@@ -83,16 +88,25 @@ export default function CatalogueTable({
     services: {
       apiFields: ["SER_SERVICENAME", "SER_VALUE"],
       tableHeaders: ["Servicio", "Valor del Servicio"],
-      formInputs: [
-        "SER_ID",
-        "SER_SERVICENAME",
-        "SER_VALUE",
-        "SER_IMAGEN",
-      ],
-    },  
+      formInputs: ["SER_ID", "SER_SERVICENAME", "SER_VALUE", "SER_IMAGEN"],
+    },
     products: {
-      apiFields: ["PRO_NAME", "PRO_QUANTITY", "PRO_UNIT", "PRO_STOCK", "PRO_VALUE", "PRO_DESCRIPTION"],
-      tableHeaders: ["Nombre", "Contenido", "Medida", "Stock", "Precio (Q)", "Descripción"],
+      apiFields: [
+        "PRO_NAME",
+        "PRO_QUANTITY",
+        "PRO_UNIT",
+        "PRO_STOCK",
+        "PRO_VALUE",
+        "PRO_DESCRIPTION",
+      ],
+      tableHeaders: [
+        "Nombre",
+        "Contenido",
+        "Medida",
+        "Stock",
+        "Precio (Q)",
+        "Descripción",
+      ],
       formInputs: [
         "PRO_ID",
         "SUP_ID",
@@ -131,7 +145,7 @@ export default function CatalogueTable({
       }
       const data = await response.json();
       console.log("Data", data);
-      
+
       setCatalogue(data);
     } catch (error) {
       console.log(
@@ -153,7 +167,7 @@ export default function CatalogueTable({
 
   const handleDelete = async (id) => {
     console.log("Entro a la funcion con id ", id);
-  
+
     // Preguntar al usuario si está seguro de eliminar el registro
     Swal.fire({
       title: "¿Estás seguro?",
@@ -163,7 +177,7 @@ export default function CatalogueTable({
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Si, eliminarlo!",
-      cancelButtonText: "Cancelar"
+      cancelButtonText: "Cancelar",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
@@ -171,17 +185,17 @@ export default function CatalogueTable({
           const response = await fetch(`${urlBase}${catalogueType}/${id}`, {
             method: "DELETE",
           });
-  
+
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-  
+
           Swal.fire({
             title: "Eliminado!",
             text: "Registro eliminado correctamente!",
-            icon: "success"
+            icon: "success",
           });
-  
+
           // Volver a cargar los datos después de eliminar
           fetchData();
         } catch (error) {
@@ -196,7 +210,6 @@ export default function CatalogueTable({
       }
     });
   };
-  
 
   const fields = catalogueFields[catalogueType]?.apiFields || [];
   const headers = catalogueFields[catalogueType]?.tableHeaders || [];
@@ -224,16 +237,29 @@ export default function CatalogueTable({
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredCatalogue.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = filteredCatalogue.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
-  const handlePaginationChange = (e, { activePage }) => setCurrentPage(activePage);
+  const handlePaginationChange = (e, { activePage }) =>
+    setCurrentPage(activePage);
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Button
           onClick={() => handleOpenModal(null)}
-          style={{ marginBottom: "20px", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)" }}
+          style={{
+            marginBottom: "20px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+          }}
           color="teal"
         >
           <Icon name="plus" /> Agregar
@@ -243,11 +269,11 @@ export default function CatalogueTable({
           placeholder="Buscar..."
           value={searchTerm}
           onChange={handleSearchChange}
-          style={{ 
-            marginBottom: "15px", 
-            width: "40%", 
-            border: "1px solid #ccc", 
-            borderRadius: "6px"      
+          style={{
+            marginBottom: "15px",
+            width: "40%",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
           }}
         />
       </div>
@@ -260,7 +286,10 @@ export default function CatalogueTable({
               celled
               striped
               className="table-catalogue"
-              style={{ width: isSidebarVisible ? "100%" : "100%", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)" }}
+              style={{
+                width: isSidebarVisible ? "100%" : "100%",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+              }}
             >
               <Table.Header>
                 <Table.Row>
@@ -277,28 +306,39 @@ export default function CatalogueTable({
                       <Table.Cell key={index}>{item[field]}</Table.Cell>
                     ))}
                     <Table.Cell style={{ textAlign: "center" }}>
-                      <Button onClick={() => handleOpenModal(item)} icon="edit" color="yellow" style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)", marginRight: "10px" }} />
+                      <Button
+                        onClick={() => handleOpenModal(item)}
+                        icon="edit"
+                        color="yellow"
+                        style={{
+                          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+                          marginRight: "10px",
+                        }}
+                      />
                       <Button
                         onClick={() => handleDelete(item[idField])}
                         icon="trash alternate"
                         color="red"
-                        style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)", marginLeft: "10px" }}
+                        style={{
+                          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.5)",
+                          marginLeft: "10px",
+                        }}
                       />
                     </Table.Cell>
                   </Table.Row>
                 ))}
               </Table.Body>
             </Table>
-            <div style={{ display: "flex", justifyContent: "flex-end"}}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <Pagination
-              activePage={currentPage}
-              onPageChange={handlePaginationChange}
-              totalPages={Math.ceil(filteredCatalogue.length / itemsPerPage)}
-              pointing
-              secondary
-              firstItem={null}
-              lastItem={null}
-            />
+                activePage={currentPage}
+                onPageChange={handlePaginationChange}
+                totalPages={Math.ceil(filteredCatalogue.length / itemsPerPage)}
+                pointing
+                secondary
+                firstItem={null}
+                lastItem={null}
+              />
             </div>
           </>
         ) : (
