@@ -368,7 +368,8 @@ export const ReportModal = ({ open, onClose, reportName }) => {
               onChange={(e) => setStateOption(e.target.value)}
             >
               <MenuItem value="1">Clientes Frecuentes</MenuItem>
-              <MenuItem value="2">Todos los clientes</MenuItem>
+              <MenuItem value="2">Clientes menos frecuentes</MenuItem>
+              <MenuItem value="3">Todos los clientes</MenuItem>
             </Select>
           </FormControl>
           <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
@@ -385,7 +386,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
                 onChange={(e) => setCustomerOption(e.target.value)}
               >
                 {customers.map((customer) => (
-                  <MenuItem key={customer.USE_ID} value={customer.USE_ID}>
+                  <MenuItem key={customer.CUS_ID} value={customer.CUS_ID}>
                     {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
                   </MenuItem>
                 ))}

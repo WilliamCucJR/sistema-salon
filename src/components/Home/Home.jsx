@@ -25,7 +25,7 @@ const Home = () => {
           </Link>
         </Grid.Column>
         <Grid.Column>
-          <Link to="/" className="menu-link">
+          <Link to="/store" className="menu-link">
             <div className="menu-box">
               <Icon name="shopping bag" size="massive" />
               <p>Comprar</p>
