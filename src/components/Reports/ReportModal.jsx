@@ -66,7 +66,15 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         productOption,
         selectedFormat,
       };
-    }
+    } else if (reportName === "Servicios") {
+        reportData = {
+        reportName,
+        dateFrom,
+        dateTo,
+        stateOption, 
+       selectedFormat,
+      };
+}
 
     if (reportData) {
       console.log("Generando reporte con los siguientes datos:", reportData);
