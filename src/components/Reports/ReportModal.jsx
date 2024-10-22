@@ -66,13 +66,22 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         productOption,
         selectedFormat,
       };
+    } else if (reportName === "Productos") {
+      reportData = {
+        reportName,
+        dateFrom,
+        dateTo,
+        stateOption,
+        productOption,
+        selectedFormat,
+      };
     }
 
     if (reportData) {
       console.log("Generando reporte con los siguientes datos:", reportData);
     } else {
       console.log(
-        "No se generó ningún reporte porque el nombre del reporte no es 'Citas'."
+        "No se generó ningún reporte.", reportName
       );
     }
 
@@ -126,9 +135,20 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     });
 
     const title = "Reporte de " + reportName;
+
+    //revisar por que no aparece
+    let subtitle = " ";
+    if (reportName == 'Productos' && stateOption == "1") {
+      subtitle = "Más vendidos"; 
+    } else if (reportName == 'Productos' && stateOption == "2") {
+      subtitle = "Menos vendidos"; 
+    }
+
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(18);
     doc.text(title, pageWidth / 2, 40, { align: "center" });
+    doc.setFontSize(14);
+    doc.text(subtitle, pageWidth / 2, 60, { align: "center" });
 
     doc.autoTable({
       startY: 50,
@@ -166,9 +186,9 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchEmployees();
   }, [fetchEmployees]);
 
-  useEffect(() => {
-    console.log("Employees:", employees);
-  }, [employees]);
+  // useEffect(() => {
+  //   console.log("Employees:", employees);
+  // }, [employees]);
 
   const fetchCustomers = useCallback(async () => {
     try {
@@ -188,9 +208,9 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  useEffect(() => {
-    console.log("Customers:", customers);
-  }, [customers]);
+  // useEffect(() => {
+  //   console.log("Customers:", customers);
+  // }, [customers]);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -210,35 +230,54 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchProducts();
   }, [fetchProducts]);
 
-  useEffect(() => {
-    console.log("Products:", products);
-  }, [products]);
+  // useEffect(() => {
+  //   console.log("Products:", products);
+  // }, [products]);
 
   const renderComboBox = () => {
     switch (reportName) {
       case "Productos":
         return (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="product-select-label">
-              Opciones de Productos
-            </InputLabel>
-            <Select
-              labelId="product-select-label"
-              value={stateOption}
-              label="Opciones de Productos"
-              onChange={(e) => setStateOption(e.target.value)}
-            >
-              <MenuItem value="productos-inventario">
-                Productos en inventario
-              </MenuItem>
-              <MenuItem value="productos-inventario">
-                Productos mas vendidos
-              </MenuItem>
-              <MenuItem value="productos-inventario">
-                Productos menos vendidos
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="product-select-label">
+                Estado
+              </InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={stateOption}
+                label="Estado"
+                onChange={(e) => setStateOption(e.target.value)}
+              >
+              <MenuItem value="1">Productos más vendidos</MenuItem>
+              <MenuItem value="2">Productos menos vendidos</MenuItem>
+              <MenuItem value="3">Todos los productos</MenuItem>
+              </Select>
+            </FormControl>
+              <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
+                <Box sx={{ px: 2, fontWeight: 'bold' }}>o</Box>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
+              </Box>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="product-select-label">Producto</InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={productOption}
+                label="Producto"
+                onChange={(e) => setProductOption(e.target.value)}
+              >
+                {products.map((product) => (
+                  <MenuItem key={product.PRO_ID} value={product.PRO_ID}>
+                    {product.PRO_NAME} {product.PRO_NAME}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+          </>
+          
+          
         );
       case "Servicios":
         return (
