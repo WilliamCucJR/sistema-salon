@@ -133,7 +133,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Reporte no es válido, inténtalo de nuevo.",
+          text: "Reporte no cuenta con suficientes datos.",
         });
       });
     clearFields();
@@ -406,7 +406,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
                 onChange={(e) => setCustomerOption(e.target.value)}
               >
                 {customers.map((customer) => (
-                  <MenuItem key={customer.USE_ID} value={customer.USE_ID}>
+                  <MenuItem key={customer.CUS_ID} value={customer.CUS_ID}>
                     {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
                   </MenuItem>
                 ))}
