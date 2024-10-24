@@ -15,7 +15,7 @@ import "jspdf-autotable";
 import logoSistema from "../../assets/logo-sistema.png";
 import { Button, Icon } from "semantic-ui-react";
 import "./Report.css";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 const style = {
   position: "absolute",
@@ -54,7 +54,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
           icon: "info",
           title: "Selecciona un tipo de formato",
         });
-      }); 
+      });
       return;
     }
 
@@ -77,12 +77,12 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         selectedFormat,
       };
     } else if (reportName === "Servicios") {
-        reportData = {
+      reportData = {
         reportName,
         dateFrom,
         dateTo,
-        stateOption, 
-       selectedFormat,
+        stateOption,
+        selectedFormat,
       };
     } else if (reportName === "Productos") {
       reportData = {
@@ -107,9 +107,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     if (reportData) {
       console.log("Generando reporte con los siguientes datos:", reportData);
     } else {
-      console.log(
-        "No se generó ningún reporte.", reportName
-      );
+      console.log("No se generó ningún reporte.", reportName);
     }
 
     const queryString = new URLSearchParams(reportData).toString();
@@ -217,7 +215,6 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchEmployees();
   }, [fetchEmployees]);
 
-
   const fetchCustomers = useCallback(async () => {
     try {
       const response = await fetch(urlGetCustomers);
@@ -254,33 +251,30 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchProducts();
   }, [fetchProducts]);
 
-
   const renderComboBox = () => {
     switch (reportName) {
       case "Productos":
         return (
           <>
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel id="product-select-label">
-                Estado
-              </InputLabel>
+              <InputLabel id="product-select-label">Estado</InputLabel>
               <Select
                 labelId="product-select-label"
                 value={stateOption}
                 label="Estado"
                 onChange={(e) => setStateOption(e.target.value)}
               >
-              <MenuItem value="1">Productos más vendidos</MenuItem>
-              <MenuItem value="2">Productos menos vendidos</MenuItem>
-              <MenuItem value="3">Todos los productos</MenuItem>
+                <MenuItem value="1">Productos más vendidos</MenuItem>
+                <MenuItem value="2">Productos menos vendidos</MenuItem>
+                <MenuItem value="3">Todos los productos</MenuItem>
               </Select>
             </FormControl>
-              <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
-                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
-                <Box sx={{ px: 2, fontWeight: 'bold' }}>o</Box>
-                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
-              </Box>
-              <FormControl fullWidth sx={{ mb: 2 }}>
+            <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: "gray" }} />
+              <Box sx={{ px: 2, fontWeight: "bold" }}>o</Box>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: "gray" }} />
+            </Box>
+            <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id="product-select-label">Producto</InputLabel>
               <Select
                 labelId="product-select-label"
@@ -295,17 +289,12 @@ export const ReportModal = ({ open, onClose, reportName }) => {
                 ))}
               </Select>
             </FormControl>
-
           </>
-          
-          
         );
       case "Servicios":
         return (
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="service-select-label">
-              Opciones
-            </InputLabel>
+            <InputLabel id="service-select-label">Opciones</InputLabel>
             <Select
               labelId="service-select-label"
               value={stateOption}
@@ -358,26 +347,24 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         return (
           <>
             <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="clients-select-label">
-              Opciones
-            </InputLabel>
-            <Select
-              labelId="clients-select-label"
-              value={stateOption}
-              label="Opciones de Clientes"
-              onChange={(e) => setStateOption(e.target.value)}
-            >
-              <MenuItem value="1">Clientes Frecuentes</MenuItem>
-              <MenuItem value="2">Clientes menos frecuentes</MenuItem>
-              <MenuItem value="3">Todos los clientes</MenuItem>
-            </Select>
-          </FormControl>
-          <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
-                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
-                <Box sx={{ px: 2, fontWeight: 'bold' }}>o</Box>
-                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
-          </Box>
-          <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="clients-select-label">Opciones</InputLabel>
+              <Select
+                labelId="clients-select-label"
+                value={stateOption}
+                label="Opciones de Clientes"
+                onChange={(e) => setStateOption(e.target.value)}
+              >
+                <MenuItem value="1">Clientes Frecuentes</MenuItem>
+                <MenuItem value="2">Clientes menos frecuentes</MenuItem>
+                <MenuItem value="3">Todos los clientes</MenuItem>
+              </Select>
+            </FormControl>
+            <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: "gray" }} />
+              <Box sx={{ px: 2, fontWeight: "bold" }}>o</Box>
+              <Box sx={{ flex: 1, height: "1px", bgcolor: "gray" }} />
+            </Box>
+            <FormControl fullWidth sx={{ mb: 2 }}>
               <InputLabel id="customer-select-label">Cliente</InputLabel>
               <Select
                 labelId="customer-select-label"
@@ -391,7 +378,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
                   </MenuItem>
                 ))}
               </Select>
-          </FormControl>
+            </FormControl>
           </>
         );
       case "Ventas":
@@ -484,19 +471,22 @@ export const ReportModal = ({ open, onClose, reportName }) => {
           />
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button 
-          variant="contained"
-          className="reports-button"
-          color="teal" 
-          onClick={handleGenerateReport}
+          <Button
+            variant="contained"
+            className="reports-button"
+            color="teal"
+            onClick={handleGenerateReport}
           >
-            <Icon name="save" /> Guardar  
+            <Icon name="save" /> Guardar
           </Button>
           <Button
-          onClick={() => {
-            clearFields();
-            onClose();   
-          }} inverted color="brown">
+            onClick={() => {
+              clearFields();
+              onClose();
+            }}
+            inverted
+            color="brown"
+          >
             <Icon name="close" /> Cerrar
           </Button>
         </div>
