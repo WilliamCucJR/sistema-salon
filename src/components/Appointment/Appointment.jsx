@@ -54,7 +54,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     ORD_ID: "",
     ORD_IDENTIFIER: "",
     ORD_ORDER_DATE: "",
-    CUS_ID: 1,
+    CUS_ID: "",
     PRO_ID: null,
     SER_ID: "",
     ORD_QUANTITY: 1,
@@ -328,6 +328,11 @@ const handleCustomerSelect = (event) => {
     CUS_EMAIL: customer ? customer.CUS_EMAIL : "",
     CUS_NIT: customer ? customer.CUS_NIT : "",
     CUS_GENDER: customer ? customer.CUS_GENDER : "",
+  }));
+
+  setOrderData((prevData) => ({
+    ...prevData,
+    CUS_ID: customerId,
   }));
 };
 

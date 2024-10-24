@@ -7,6 +7,8 @@ import ExitIcon from "@rsuite/icons/Exit";
 import PeoplesIcon from "@rsuite/icons/Peoples";
 import PeoplesMapIcon from "@rsuite/icons/PeoplesMap";
 import CalendarIcon from "@rsuite/icons/Calendar";
+import FileDownloadIcon from '@rsuite/icons/FileDownload';
+import EditIcon from '@rsuite/icons/Edit';
 import AdminIcon from "@rsuite/icons/Admin";
 import TagIcon from "@rsuite/icons/Tag";
 import GrowthIcon from '@rsuite/icons/Growth';
@@ -91,7 +93,7 @@ export default function SideMenu() {
                   as={Link}
                   to="/reports"
                   eventKey="2"
-                  icon={<CalendarIcon />}
+                  icon={<FileDownloadIcon />}
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
                   Reportes
@@ -114,60 +116,69 @@ export default function SideMenu() {
                 >
                   Tienda
                 </Nav.Item>
-                <Nav.Item
-                  as={Link}
-                  to="/customers"
-                  eventKey="5"
-                  icon={<PeoplesIcon />}
+                <Nav.Menu 
+                  eventKey="5" 
+                  title="Mantenimiento" 
+                  icon={<EditIcon />}
+                  className="sidenav-container"
                   style={{ backgroundColor: "#9eb5b0" }}
                 >
-                  Clientes
-                </Nav.Item>
-                <Nav.Item
-                  as={Link}
-                  to="/services"
-                  eventKey="6"
-                  icon={<MagicIcon />}
-                  style={{ backgroundColor: "#9eb5b0" }}
-                >
-                  Servicios
-                </Nav.Item>
-                <Nav.Item
-                  as={Link}
-                  to="/suppliers"
-                  eventKey="7"
-                  icon={<AdminIcon />}
-                  style={{ backgroundColor: "#9eb5b0" }}
-                >
-                  Proveedores
-                </Nav.Item>
-                <Nav.Item
-                  as={Link}
-                  to="/products"
-                  eventKey="8"
-                  icon={<TagIcon />}
-                  style={{ backgroundColor: "#9eb5b0" }}
-                >
-                  Productos
-                </Nav.Item>
-                <Nav.Item
-                  as={Link}
-                  to="/employees"
-                  eventKey="9"
-                  icon={<PeoplesMapIcon />}
-                  style={{ backgroundColor: "#9eb5b0" }}
-                >
-                  Empleados
-                </Nav.Item>
+                  <Nav.Item
+                    as={Link}
+                    to="/customers"
+                    eventKey="5-0"
+                    icon={<PeoplesIcon />}
+                    style={{ backgroundColor: "#9eb5b0", display: 'flex', gap: '10px'}}
+                  >
+                    Clientes
+                  </Nav.Item>
+                  <Nav.Item
+                    as={Link}
+                    to="/services"
+                    eventKey="5-1"
+                    icon={<MagicIcon />}
+                    style={{ backgroundColor: "#9eb5b0", display: 'flex', gap: '10px'}}
+                  >
+                    Servicios
+                  </Nav.Item>
+                  <Nav.Item
+                    as={Link}
+                    to="/suppliers"
+                    eventKey="5-2"
+                    icon={<AdminIcon />}
+                    style={{ backgroundColor: "#9eb5b0", display: 'flex', gap: '10px'}}
+                  >
+                    Proveedores
+                  </Nav.Item>
+                  <Nav.Item
+                    as={Link}
+                    to="/products"
+                    eventKey="5-3"
+                    icon={<TagIcon />}
+                    style={{ backgroundColor: "#9eb5b0", display: 'flex', gap: '10px'}}
+                  >
+                    Productos
+                  </Nav.Item>
+                  <Nav.Item
+                    as={Link}
+                    to="/employees"
+                    eventKey="5-4"
+                    icon={<PeoplesMapIcon />}
+                    style={{ backgroundColor: "#9eb5b0", display: 'flex', gap: '10px'}}
+                  >
+                    Empleados
+                  </Nav.Item>
+                </Nav.Menu>
                 <Nav.Item
                   as={Link}
                   to="/"
                   eventKey="10"
                   icon={<ExitIcon />}
-                  style={{ backgroundColor: "#9eb5b0" }}
+                  style={{ 
+                    backgroundColor: "#9eb5b0"}}
                   onClick={closeSession}
                 >
-                  Salir
+                    Salir
                 </Nav.Item>
               </Nav>
             </Sidenav.Body>

@@ -15,6 +15,7 @@ import "jspdf-autotable";
 import logoSistema from "../../assets/logo-sistema.png";
 import { Button, Icon } from "semantic-ui-react";
 import "./Report.css";
+import Swal from 'sweetalert2';
 
 const style = {
   position: "absolute",
@@ -47,6 +48,15 @@ export const ReportModal = ({ open, onClose, reportName }) => {
 
   const handleGenerateReport = () => {
     let reportData = null;
+    if (!selectedFormat) {
+      setTimeout(() => {
+        Swal.fire({
+          icon: "info",
+          title: "Selecciona un tipo de formato",
+        });
+      }); 
+      return;
+    }
 
     if (reportName === "Citas") {
       reportData = {
@@ -66,13 +76,39 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         productOption,
         selectedFormat,
       };
+    } else if (reportName === "Servicios") {
+        reportData = {
+        reportName,
+        dateFrom,
+        dateTo,
+        stateOption, 
+       selectedFormat,
+      };
+    } else if (reportName === "Productos") {
+      reportData = {
+        reportName,
+        dateFrom,
+        dateTo,
+        stateOption,
+        productOption,
+        selectedFormat,
+      };
+    } else if (reportName === "Clientes") {
+      reportData = {
+        reportName,
+        dateFrom,
+        dateTo,
+        stateOption,
+        customerOption,
+        selectedFormat,
+      };
     }
 
     if (reportData) {
       console.log("Generando reporte con los siguientes datos:", reportData);
     } else {
       console.log(
-        "No se generó ningún reporte porque el nombre del reporte no es 'Citas'."
+        "No se generó ningún reporte.", reportName
       );
     }
 
@@ -94,9 +130,24 @@ export const ReportModal = ({ open, onClose, reportName }) => {
       })
       .catch((error) => {
         console.error("Error al generar el reporte:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Reporte no cuenta con suficientes datos.",
+        });
       });
-
+    clearFields();
     onClose();
+  };
+
+  const clearFields = () => {
+    setDateFrom("");
+    setDateTo("");
+    setStateOption("");
+    setEmployeeOption("");
+    setCustomerOption("");
+    setProductOption("");
+    setSelectedFormat("");
   };
 
   const exportToExcel = (data, reportName) => {
@@ -166,9 +217,6 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchEmployees();
   }, [fetchEmployees]);
 
-  useEffect(() => {
-    console.log("Employees:", employees);
-  }, [employees]);
 
   const fetchCustomers = useCallback(async () => {
     try {
@@ -188,10 +236,6 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  useEffect(() => {
-    console.log("Customers:", customers);
-  }, [customers]);
-
   const fetchProducts = useCallback(async () => {
     try {
       const response = await fetch(urlGetProducts);
@@ -210,41 +254,57 @@ export const ReportModal = ({ open, onClose, reportName }) => {
     fetchProducts();
   }, [fetchProducts]);
 
-  useEffect(() => {
-    console.log("Products:", products);
-  }, [products]);
 
   const renderComboBox = () => {
     switch (reportName) {
       case "Productos":
         return (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="product-select-label">
-              Opciones de Productos
-            </InputLabel>
-            <Select
-              labelId="product-select-label"
-              value={stateOption}
-              label="Opciones de Productos"
-              onChange={(e) => setStateOption(e.target.value)}
-            >
-              <MenuItem value="productos-inventario">
-                Productos en inventario
-              </MenuItem>
-              <MenuItem value="productos-inventario">
-                Productos mas vendidos
-              </MenuItem>
-              <MenuItem value="productos-inventario">
-                Productos menos vendidos
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="product-select-label">
+                Estado
+              </InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={stateOption}
+                label="Estado"
+                onChange={(e) => setStateOption(e.target.value)}
+              >
+              <MenuItem value="1">Productos más vendidos</MenuItem>
+              <MenuItem value="2">Productos menos vendidos</MenuItem>
+              <MenuItem value="3">Todos los productos</MenuItem>
+              </Select>
+            </FormControl>
+              <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
+                <Box sx={{ px: 2, fontWeight: 'bold' }}>o</Box>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
+              </Box>
+              <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="product-select-label">Producto</InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={productOption}
+                label="Producto"
+                onChange={(e) => setProductOption(e.target.value)}
+              >
+                {products.map((product) => (
+                  <MenuItem key={product.PRO_ID} value={product.PRO_ID}>
+                    {product.PRO_NAME}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+          </>
+          
+          
         );
       case "Servicios":
         return (
           <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel id="service-select-label">
-              Opciones de Servicios
+              Opciones
             </InputLabel>
             <Select
               labelId="service-select-label"
@@ -296,9 +356,10 @@ export const ReportModal = ({ open, onClose, reportName }) => {
         );
       case "Clientes":
         return (
-          <FormControl fullWidth sx={{ mb: 2 }}>
+          <>
+            <FormControl fullWidth sx={{ mb: 2 }}>
             <InputLabel id="clients-select-label">
-              Opciones de Clientes
+              Opciones
             </InputLabel>
             <Select
               labelId="clients-select-label"
@@ -306,12 +367,32 @@ export const ReportModal = ({ open, onClose, reportName }) => {
               label="Opciones de Clientes"
               onChange={(e) => setStateOption(e.target.value)}
             >
-              <MenuItem value="clientes-frecuentes">
-                Clientes frecuentes
-              </MenuItem>
-              <MenuItem value="clientes-nuevos">Clientes nuevos</MenuItem>
+              <MenuItem value="1">Clientes Frecuentes</MenuItem>
+              <MenuItem value="2">Clientes menos frecuentes</MenuItem>
+              <MenuItem value="3">Todos los clientes</MenuItem>
             </Select>
           </FormControl>
+          <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
+                <Box sx={{ px: 2, fontWeight: 'bold' }}>o</Box>
+                <Box sx={{ flex: 1, height: '1px', bgcolor: 'gray' }} />
+          </Box>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel id="customer-select-label">Cliente</InputLabel>
+              <Select
+                labelId="customer-select-label"
+                value={customerOption}
+                label="Cliente"
+                onChange={(e) => setCustomerOption(e.target.value)}
+              >
+                {customers.map((customer) => (
+                  <MenuItem key={customer.CUS_ID} value={customer.CUS_ID}>
+                    {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
+                  </MenuItem>
+                ))}
+              </Select>
+          </FormControl>
+          </>
         );
       case "Ventas":
         return (
@@ -325,7 +406,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
                 onChange={(e) => setCustomerOption(e.target.value)}
               >
                 {customers.map((customer) => (
-                  <MenuItem key={customer.USE_ID} value={customer.USE_ID}>
+                  <MenuItem key={customer.CUS_ID} value={customer.CUS_ID}>
                     {customer.CUS_FIRST_NAME} {customer.CUS_LAST_NAME}
                   </MenuItem>
                 ))}
@@ -341,7 +422,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
               >
                 {products.map((product) => (
                   <MenuItem key={product.PRO_ID} value={product.PRO_ID}>
-                    {product.PRO_NAME} {product.PRO_NAME}
+                    {product.PRO_NAME}
                   </MenuItem>
                 ))}
               </Select>
@@ -354,7 +435,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} disableEnforceFocus>
       <Box sx={style} className="Modal">
         <h2>{reportName}</h2>
         <TextField
@@ -403,13 +484,20 @@ export const ReportModal = ({ open, onClose, reportName }) => {
           />
         </div>
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button
-            variant="contained"
-            className="reports-button"
-            color="teal"
-            onClick={handleGenerateReport}
+          <Button 
+          variant="contained"
+          className="reports-button"
+          color="teal" 
+          onClick={handleGenerateReport}
           >
-            Generar Reporte
+            <Icon name="save" /> Guardar  
+          </Button>
+          <Button
+          onClick={() => {
+            clearFields();
+            onClose();   
+          }} inverted color="brown">
+            <Icon name="close" /> Cerrar
           </Button>
         </div>
       </Box>

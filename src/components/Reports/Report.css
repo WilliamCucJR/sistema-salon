@@ -43,6 +43,11 @@
     gap: 15px;
 }
 .reports-button{
-    width: 150px;
+    width: 120px;
+} 
+.swal2-container {
+    z-index: 1500 !important;
 }
-  
+.Modal {
+    z-index: 1000 !important;
+}

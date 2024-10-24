@@ -25,7 +25,7 @@ const Home = () => {
           </Link>
         </Grid.Column>
         <Grid.Column>
-          <Link to="/" className="menu-link">
+          <Link to="/store" className="menu-link">
             <div className="menu-box">
               <Icon name="shopping bag" size="massive" />
               <p>Comprar</p>
@@ -33,7 +33,7 @@ const Home = () => {
           </Link>
         </Grid.Column>
         <Grid.Column>
-          <Link to="/" className="menu-link">
+          <Link to="/reports" className="menu-link">
             <div className="menu-box">
               <Icon name="file alternate outline" size="massive" />
               <p>Reportes</p>
@@ -41,10 +41,10 @@ const Home = () => {
           </Link>
         </Grid.Column>
         <Grid.Column>
-          <Link to="/" className="menu-link">
+          <Link to="/employees" className="menu-link">
             <div className="menu-box">
-              <Icon name="tags" size="massive" />
-              <p>Promociones</p>
+              <Icon name="users" size="massive" />
+              <p>Empleados</p>
             </div>
           </Link>
         </Grid.Column>

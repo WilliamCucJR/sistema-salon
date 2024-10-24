@@ -1,3 +1,6 @@
 .bottom-image-container {
     margin-top: auto;
-  }
+}
+.rs-sidenav-default, .rs-sidenav-default .rs-dropdown-toggle, .rs-sidenav-default .rs-sidenav-item, .rs-sidenav-default .rs-sidenav-toggle-button {
+  background-color:  #9eb5b0 !important;
+}
