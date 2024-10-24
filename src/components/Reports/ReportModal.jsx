@@ -290,7 +290,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
               >
                 {products.map((product) => (
                   <MenuItem key={product.PRO_ID} value={product.PRO_ID}>
-                    {product.PRO_NAME} {product.PRO_NAME}
+                    {product.PRO_NAME}
                   </MenuItem>
                 ))}
               </Select>
@@ -422,7 +422,7 @@ export const ReportModal = ({ open, onClose, reportName }) => {
               >
                 {products.map((product) => (
                   <MenuItem key={product.PRO_ID} value={product.PRO_ID}>
-                    {product.PRO_NAME} {product.PRO_NAME}
+                    {product.PRO_NAME}
                   </MenuItem>
                 ))}
               </Select>
