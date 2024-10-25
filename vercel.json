@@ -1,3 +1,13 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://3.146.117.200:3000/api/$1"
+    },
+    {
+      "source": "/uploads/(.*)",
+      "destination": "http://3.146.117.200:3000/uploads/$1"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
