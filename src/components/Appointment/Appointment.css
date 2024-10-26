@@ -5,7 +5,7 @@
     justify-content: center;
 }
 .stat-item{
-    background-color: #f0f0f0;
+    background: #dfe1e2;  /* fallback for old browsers */
     width: 250px;
     height: 125px;
     border-radius: 20px;
@@ -15,6 +15,18 @@
     justify-content: center;
     align-items: start;
     gap: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+    cursor: pointer;
+}
+.stat-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background: #9EB5B0; 
+    background: -webkit-linear-gradient(to left, #C4D9D5, #9EB5B0);  
+    background: linear-gradient(to left, #C4D9D5, #9EB5B0);
+    
+    
+
 }
 .appointment-form{
     display: flex;
@@ -145,7 +157,7 @@
     padding: 5px 0;   
     white-space: normal; 
 }
-.select-service-price{
+.select-service-price, .stat-title{
     font-weight: bold;
 }
 
