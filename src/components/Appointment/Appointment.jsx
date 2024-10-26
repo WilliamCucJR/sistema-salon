@@ -107,7 +107,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${urlBase}services`);
+        const response = await fetch(`${urlBase}/services`);
         const servicesData = await response.json();
         setServices(servicesData); 
       } catch (error) {
@@ -116,9 +116,11 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     };
   
     if (activeStep === 0) {
-      fetchServices();
+      fetchServices(); 
+      const intervalId = setInterval(fetchServices, 60000);
+      return () => clearInterval(intervalId);
     }
-  }, [activeStep, urlBase]);  
+  }, [activeStep, urlBase]);
 
     useEffect(() => {
       console.log("OrderData actualizado:", orderData);
@@ -163,6 +165,8 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     
       if (activeStep === 1) {
         fetchEmployees();
+        const intervalId = setInterval(fetchEmployees, 60000);
+        return () => clearInterval(intervalId);
       }
     }, [activeStep, urlBase]); 
   
@@ -309,6 +313,8 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
 
       if (activeStep === 3) {
         fetchCustomers();
+        const intervalId = setInterval(fetchCustomers, 60000);
+        return () => clearInterval(intervalId);
       }
     }, [activeStep, urlBase]); 
 
