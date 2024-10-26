@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import AppointmentCalendar from '../Calendar/Calendar';
 import Modal from '../AppointmentModal/AppointmentModal';
 import './Appointment.css';
@@ -6,29 +7,94 @@ import { Button, Icon } from "semantic-ui-react";
 import Swal from "sweetalert2";
 import { Calendar } from 'react-multi-date-picker';
 const StatsPanel = () => {
+
+  const urlBase = import.meta.env.VITE_DEVELOP_URL_API;
+
+  const [totalClientes, setTotalClientes] = useState(0);
+  const [totalServicios, setTotalServicios] = useState(0);
+  const [totalGanancias, setTotalGanancias] = useState(0);
+  const [totalEmpleados, setTotalEmpleados] = useState(0);
+
+  useEffect(() => {
+    const fetchCustomerCount = async () => {
+      try {
+        const response = await fetch(`${urlBase}/customers`);
+        const customerData = await response.json();
+        setTotalClientes(customerData.length); 
+      } catch (error) {
+        console.error("Error al obtener el total de clientes:", error);
+      }
+    };
+
+    const fetchServiceCount = async () => {
+      try {
+        const response = await fetch(`${urlBase}/services`);
+        const serviceData = await response.json();
+        setTotalServicios(serviceData.length); 
+      } catch (error) {
+        console.error("Error al obtener el total de Servicios:", error);
+      }
+    };
+
+    const fetchTotalGanancias = async () => {
+      try {
+        const response = await fetch(`${urlBase}/orders`);
+        const cartData = await response.json();
+        // Asegurarse de convertir cada ORD_TOTAL a número antes de sumarlo
+        const total = cartData.reduce((sum, item) => sum + parseFloat(item.ORD_TOTAL) || 0, 0);
+        setTotalGanancias(total);
+      } catch (error) {
+        console.error("Error al obtener el total de ganancias:", error);
+      }
+    };
+
+    const fetchtEmployeesCount = async () => {
+      try {
+        const response = await fetch(`${urlBase}/employees`);
+        const employeeData = await response.json();
+        setTotalEmpleados(employeeData.length); 
+      } catch (error) {
+        console.error("Error al obtener el total de Empleados:", error);
+      }
+    };
+
+    fetchCustomerCount();
+    fetchServiceCount(); 
+    fetchTotalGanancias();
+    fetchtEmployeesCount();
+  }, [urlBase]);
+
+
   return (
     <div className="stats-panel" style={{ marginBottom: '10px' }}>
-      <div className="stat-item">
+      <Link to="/reports" className="stat-item" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className='icon-container' style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
-          <h3>Q 1,200.00</h3>
+          <h3>Q {totalGanancias.toFixed(2)}</h3>
           <Icon name='chart line' size='big' />
         </div>
-        <p>Ganancias</p>
-      </div>
-      <div className="stat-item">
+        <p className='stat-title'>Ganancias</p>
+      </Link>
+      <Link to="/services" className="stat-item" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className='icon-container' style={{ display: 'flex', gap: '130px', alignItems: 'center' }}>
-          <h2>12</h2>
+          <h2>{totalServicios}</h2>
           <Icon name='handshake outline' size='big' />
         </div>
-        <p>Servicios</p>
-      </div>
-      <div className="stat-item">
+        <p className='stat-title'>Servicios</p>
+      </Link>
+      <Link to="/customers" className="stat-item" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className='icon-container' style={{ display: 'flex', gap: '145px', alignItems: 'center' }}>
-          <h2>8</h2>
+          <h2>{totalClientes}</h2>
           <Icon name='users' size='big' />
         </div>
-        <p>Clientes</p>
-      </div>
+        <p className='stat-title'>Clientes</p>
+      </Link>
+      <Link to="/employees" className="stat-item" style={{ textDecoration: 'none', color: 'inherit' }}>
+        <div className='icon-container' style={{ display: 'flex', gap: '145px', alignItems: 'center' }}>
+          <h2>{totalEmpleados}</h2>
+          <Icon name='user' size='big' />
+        </div>
+        <p className='stat-title'>Empleados</p>
+      </Link>
     </div>
   );
 };
@@ -107,7 +173,7 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch(`${urlBase}services`);
+        const response = await fetch(`${urlBase}/services`);
         const servicesData = await response.json();
         setServices(servicesData); 
       } catch (error) {
@@ -116,9 +182,11 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     };
   
     if (activeStep === 0) {
-      fetchServices();
+      fetchServices(); 
+      const intervalId = setInterval(fetchServices, 60000);
+      return () => clearInterval(intervalId);
     }
-  }, [activeStep, urlBase]);  
+  }, [activeStep, urlBase]);
 
     useEffect(() => {
       console.log("OrderData actualizado:", orderData);
@@ -163,6 +231,8 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
     
       if (activeStep === 1) {
         fetchEmployees();
+        const intervalId = setInterval(fetchEmployees, 60000);
+        return () => clearInterval(intervalId);
       }
     }, [activeStep, urlBase]); 
   
@@ -309,6 +379,8 @@ const AppointmentForm = ({ onClose, onFormSubmit }) => {
 
       if (activeStep === 3) {
         fetchCustomers();
+        const intervalId = setInterval(fetchCustomers, 60000);
+        return () => clearInterval(intervalId);
       }
     }, [activeStep, urlBase]); 
 
@@ -679,9 +751,9 @@ const Appointments = () => {
     <div className="dashboard">
       <main className="main-content">
         <StatsPanel />
-        <div style={{ marginLeft: '50px', textAlign: 'left' }}>
+        <div style={{ marginLeft: '50px', marginTop: '30px', textAlign: 'left' }}>
           <Button color="teal" onClick={handleAddButtonClick}>
-            <Icon name="plus" /> Agregar
+            <Icon name="plus" /> Agendar
           </Button>
         </div>
         <AppointmentCalendar />
